@@ -1,6 +1,7 @@
 from django.shortcuts import render,redirect
-from ssdapp.models import CustomerMaster,CustomerDetails,MaterialMaster,InwardMaster
+from ssdapp.models import CustomerMaster,CustomerDetails,MaterialMaster,InwardMaster,City
 from django.contrib import messages
+from django.http import JsonResponse
 
 # Create your views here.
 
@@ -208,3 +209,9 @@ def listInward(request):
     data = InwardMaster.objects.filter(Status = 1)
     context = {'data':data}
     return render(request,'list_inward.html',context)
+
+
+def city_autocomplete(request):
+
+
+    return render(request,'auto_complete.html')

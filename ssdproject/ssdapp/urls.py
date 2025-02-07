@@ -14,4 +14,5 @@ urlpatterns = [
     path('deletematerial/<str:id>',views.deleteMaterial,name='deletematerial'),
     path('addinward/<str:id>',views.addInward,name='addinward'),
     path('listinward/',views.listInward,name='listinward'),
+    path('autocomplete/',views.city_autocomplete,name='autocomplete'),
 ]

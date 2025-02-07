@@ -41,3 +41,11 @@ class InwardMaster(models.Model):
     Batch_Id = models.CharField(max_length=50)
     Additional_Info = models.CharField(max_length=50)
     Status = models.IntegerField(default=1)
+
+
+
+class City(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name

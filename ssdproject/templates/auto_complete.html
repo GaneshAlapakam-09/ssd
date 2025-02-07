@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Autocomplete Dropdown</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+</head>
+<body>
+
+    <label for="city">Choose a City:</label>
+    <select id="city-dropdown" style="width: 300px;">
+
+    </select>
+
+    <script>
+        $(document).ready(function () {
+            $("#city-dropdown").select2({
+                ajax: {
+                    url: "autocomplete/",
+                    dataType: "json",
+                    delay: 250,
+                    data: function (params) {
+                        return { q: params.term };
+                    },
+                    processResults: function (data) {
+                        return { results: data.results };
+                    },
+                    cache: true
+                },
+                placeholder: "Search for a city",
+                minimumInputLength: 1
+            });
+        });
+    </script>
+
+</body>
+</html>
