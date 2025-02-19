@@ -2939,6 +2939,14 @@ fieldset[disabled] .btn-youtube.active {
   display: block;
   margin-bottom: 15px;
 }
+.ui-checkbox,
+.ui-radio.cost-radio {
+  position: relative;
+  display: flex;
+  margin-top: 8px;
+  padding: 0px 10px;
+  margin-bottom: 0px;
+}
 .ui-checkbox label.ui-checkbox-inline,
 .ui-radio label.ui-checkbox-inline {
   margin-right: 8px;
@@ -3693,7 +3701,7 @@ fieldset[disabled] .btn-youtube.active {
 .site-head {
   position: relative;
   width: calc(100% - 65px);
-  height: 55px;
+  height: 60px;
   margin-left: 65px;
 }
 .site-head.fixedHeader {
@@ -3729,23 +3737,24 @@ fieldset[disabled] .btn-youtube.active {
   }
 }
 .main-container .nav-wrap:hover {
-  width: 220px;
+  width: 250px;
 }
 .main-container .nav-wrap:hover .nav-head {
-  width: 220px;
+  width: 250px;
 }
 .site-head.nav-expand {
   width: calc(100% - 220px);
   margin-left: 220px;
 }
 .main-container .nav-wrap.nav-expand {
-  width: 220px;
+  width: 250px;
 }
 .main-container .nav-wrap.nav-expand .nav-head {
   width: 250px;
 }
 .main-container .content-container {
   margin-left: 65px;
+  margin-top: 75px;
   width: calc(100% - 65px);
 }
 .main-container .content-container.nav-expand {
@@ -4062,7 +4071,7 @@ fieldset[disabled] .btn-youtube.active {
   overflow: hidden;
   width: 65px;
   position: fixed;
-  padding-left: 22px;
+  padding-left: px;
   z-index: 1000;
   -webkit-transition: 0.25s ease-in;
   -o-transition: 0.25s ease-in;
@@ -4171,7 +4180,7 @@ fieldset[disabled] .btn-youtube.active {
 .main-container .nav-wrap .site-nav .nav-list > li a .badge {
   margin-top: 12px;
 }
-.main-container .nav-wrap .site-nav .nav-list > li a i.ion , .icon.ion-md-people, .icon.ion-md-cube, .icon.ion-logo-dropbox{
+.main-container .nav-wrap .site-nav .nav-list > li a i.ion , .icon.ion-md-people, .icon.ion-md-cube, .icon.ion-logo-dropbox, .icon.ion-md-albums ,.icon{
   display: inline-block;
   font-size: 16px;
   padding: 5px 0;
@@ -4316,7 +4325,7 @@ fieldset[disabled] .btn-youtube.active {
     z-index: 1040;
   }
   #app.off-canvas .main-container .nav-wrap {
-    width: 220px;
+    width: 235px;
     -webkit-transform: translate(-100%, 0);
     -ms-transform: translate(-100%, 0);
     -o-transform: translate(-100%, 0);

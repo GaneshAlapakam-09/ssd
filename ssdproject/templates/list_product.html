@@ -10,10 +10,6 @@
 	<!-- <base href="/"> -->
 
 	<title>SSD</title>
-	
-
-
-
 
 
 {% load static %}
@@ -189,7 +185,7 @@
 		<!-- Data Table -->
 		<div class="col-md-11">
 			<div class="panel panel-lined table-responsive panel-hovered mb20 data-table" style="padding-bottom: 20px">
-				<div class="panel-heading">Customer List</div>
+				<div class="panel-heading">Product List</div>
 				<div class="panel-body">
 					<div class="small text-bold left mt5">
 						Show&nbsp;
@@ -206,68 +202,53 @@
 						<input type="text" class="form-control input-sm searchInput" placeholder="Type keyword">
 					</form>
 				</div>
-			<!-- data table -->
-			<table class="table table-bordered table-striped">
-				<thead>
-					<tr>
-						<th>
-							Customer Id
-							<div class="th">
-								<i class="fa fa-caret-up icon-up"></i>
-								<i class="fa fa-caret-down icon-down"></i>
-							</div>
-						</th>
-						<th>
-							Customer Name
-							<div class="th">
-								<i class="fa fa-caret-up icon-up"></i>
-								<i class="fa fa-caret-down icon-down"></i>
-							</div>
-						</th>
-						<th>
-							Phone No.
-							<div class="th">
-								<i class="fa fa-caret-up icon-up"></i>
-								<i class="fa fa-caret-down icon-down"></i>
-							</div>
-						</th>
-						<th>
-							Alt Phone No.
-							<div class="th">
-								<i class="fa fa-caret-up icon-up"></i>
-								<i class="fa fa-caret-down icon-down"></i>
-							</div>
-						</th>
-						<th>
-							Email
-							<div class="th">
-								<i class="fa fa-caret-up icon-up"></i>
-								<i class="fa fa-caret-down icon-down"></i>
-							</div>
-						</th>
-						<th>
-							Address
-							<div class="th">
-								<i class="fa fa-caret-up icon-up"></i>
-								<i class="fa fa-caret-down icon-down"></i>
-							</div>
-						</th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for item in data %}
-					<tr>
-						<td>{{item.Customer_Id}}</td>
-						<td>{{item.Customer_Name}}</td>
-						<td>{{item.Phone_No}}</td>
-						<td>{{item.Alt_Phone}}</td>
-						<td>{{item.Email}}</td>
-						<td>{{item.Address}}</td>
-					</tr>
-					{% endfor %}
-				</tbody>
-			</table>
-			<!-- #end data table -->	
+										<!-- data table -->
+										<table class="table table-bordered table-striped">
+											<thead>
+												<tr>
+													<th>
+														 Product ID
+														<div class="th">
+															<i class="fa fa-caret-up icon-up"></i>
+															<i class="fa fa-caret-down icon-down"></i>
+														</div>
+													</th>
+													<th>
+													 Product Name
+														<div class="th">
+															<i class="fa fa-caret-up icon-up"></i>
+															<i class="fa fa-caret-down icon-down"></i>
+														</div>
+													</th>
+													<th>
+													 GST in %
+														<div class="th">
+															<i class="fa fa-caret-up icon-up"></i>
+															<i class="fa fa-caret-down icon-down"></i>
+														</div>
+													</th>
+													<th>
+														HSN Code
+														<div class="th">
+															<i class="fa fa-caret-up icon-up"></i>
+															<i class="fa fa-caret-down icon-down"></i>
+														</div>
+													</th>
+													
+													<th>
+														Action
+														<div class="th">
+															<i class="fa fa-caret-up icon-up"></i>
+															<i class="fa fa-caret-down icon-down"></i>
+														</div>
+													</th>
+												</tr>
+											</thead>
+											<tbody>
+												<!-- data initialize via script, can also be load via ajax -->
+											</tbody>
+										</table>
+										<!-- #end data table -->
 			
 		</div>
 		</div>
@@ -348,7 +329,8 @@
 
 	<!-- Dev only -->
 	<!-- Vendors -->
-	
+
+
 	{% load static %}
 
 
@@ -362,7 +344,93 @@
 <script src="{% static 'scripts/plugins/waves.min.js' %}"></script>
 <script src="{% static 'scripts/plugins/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'scripts/app.js' %}"></script>
-<script src="{% static 'scripts/tables.init.js' %}"></script>
+{% comment %} <script src="{% static 'scripts/tables.init.js' %}"></script> {% endcomment %}
+
+<script>
+	$(function () {
+		"use strict";
+	
+		function toggleBasicTableFns() {
+			var $btable = $(".basic-table");
+			var btns = [".btable-bordered", ".btable-striped", ".btable-condensed", ".btable-hover"];
+	
+			btns.forEach(function (btn) {
+				$btable.find(btn).on("click touchstart", function (e) {
+					var tableClass = $(this).data("table-class");
+					e.preventDefault();
+					$(this).toggleClass("active");
+					$btable.find("table").toggleClass(tableClass);
+				});
+			});
+		}
+	
+		function initDataTable() {
+			var $dataTable = $(".data-table");
+			var $table = $dataTable.find("table");
+	
+			var datas = [
+				{% for item in data %}
+				{ 
+					Product_id: "{{ item.Product_Id|escapejs }}", 
+					Product_name: "{{ item.Product_Name|escapejs }}", 
+					GST: "{{ item.GST|escapejs }}", 
+					HST_Code: "{{ item.HSN_Code|escapejs }}", 
+					action: `<div class="btn-group list-cust">
+								<a href=""><button type="button" class="btn btn-default ion icon ion-md-create"></button></a>
+								<a href=""><button type="button" class="btn btn-default ion icon ion-md-list"></button></a>
+								<a class="del-btn" href=""><button type="button" class="btn btn-default ion icon ion-md-trash waves-effect"></button></a>
+							</div>`
+				}{% if not loop.last %},{% endif %}
+				{% endfor %}
+			];
+	
+			var table = $table.DataTable({
+				data: datas,
+				columns: [
+					{ data: "Product_id" },
+					{ data: "Product_name" },
+					{ data: "GST" },
+					{ data: "HST_Code" },
+					{ data: "action" }
+				],
+				searching: true,
+				dom: "rtip",
+				pageLength: 10
+			});
+	
+			$dataTable.find(".searchInput").on("keyup", function () {
+				table.search(this.value).draw();
+			});
+	
+			$dataTable.find(".lengthSelect").on("change", function () {
+				table.page.len(this.value).draw();
+			});
+	
+			$dataTable.find(".dataTables_info").css({
+				"margin-left": "20px",
+				"font-size": "12px"
+			});
+	
+			// Confirmation alert before deleting
+			$(document).on("click", ".del-btn", function (e) {
+				e.preventDefault(); // Prevent default navigation
+				var deleteUrl = $(this).attr("href");
+				if (confirm("Are you sure you want to delete this customer?")) {
+					window.location.href = deleteUrl; // Proceed with deletion
+				}
+			});
+		}
+	
+		function _init() {
+			toggleBasicTableFns();
+			initDataTable();
+		}
+	
+		_init();
+	});
+	
+
+</script>
 	
 
 </body>

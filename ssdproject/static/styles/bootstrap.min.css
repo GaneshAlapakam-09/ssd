@@ -2726,6 +2726,13 @@ tbody.collapse.in {
   display: inline-block;
   vertical-align: middle;
 }
+.btn-group.list-cust,
+.btn-group-vertical {
+  position: relative;
+  display: flex;
+  gap: 5px;
+  vertical-align: middle;
+}
 .btn-group > .btn,
 .btn-group-vertical > .btn {
   position: relative;

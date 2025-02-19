@@ -10,6 +10,44 @@
 	<!-- <base href="/"> -->
 
 	<title>SSD</title>
+
+    <style>
+        /* General styling */
+.dropdown {
+    width: 100%; /* Full width */
+    padding: 10px;
+    font-size: 16px;
+    border:2px solid #ccc;
+    border-radius: 0px;
+    background-color: #fff;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+/* Focus effect */
+.dropdown:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Disabled option */
+.dropdown option:disabled {
+    color: #aaa;
+}
+
+/* Hover effect */
+.dropdown:hover {
+    border-color: #0056b3;
+}
+
+/* Custom styling for when dropdown is open */
+.dropdown:active,
+.dropdown:focus-within {
+    background-color: #f9f9f9;
+}
+
+    </style>
 	
 	{% load static %}
 	<link rel="icon" type="image/x-icon" href="{% static 'images/SS_LOGO.png' %}">
@@ -184,7 +222,7 @@
 			<!-- col-left -->
 			<div class="col-sm-12 col-md-11">
 				<div class="panel panel-default panel-hovered panel-stacked mb30">
-					<div class="panel-heading">Add Inward</div>
+					<div class="panel-heading">Add Categories</div>
 					{% if messages %}
 
         {% for message in messages %}
@@ -195,90 +233,50 @@
         
         {% endif %}
 					<div class="panel-body">
-						<form  class="form-horizontal"  method="POST">
+						<form id='form' class="form-horizontal"  method="POST">
 							{% csrf_token %}
 							 <!-- form horizontal acts as a row -->
-							<!-- Material Id -->
+							<!-- Product Id -->
 							<div class="form-group">
-								<label class="col-md-3 control-label">Material Id</label>
-                                {% for item in mat_id %}
+								<label class="col-md-3 control-label">Category Id </label>
 								<div class="col-md-9">
-                                        <input type="text" value="{{ item.Material_Id }}" name='material_id' class="form-control" placeholder="Material Id" readonly>
-                                </div>
-                                {% endfor %}
-							</div>
-							<!-- Inward Id -->
-							<div class="form-group">
-								<label class="col-md-3 control-label">Inward Id</label>
-								<div class="col-md-9">
-									<input type="text" value="{{inw_id}}" class="form-control" placeholder="Inward Id" name='inward_id' readonly>
+									<input type="text" value="{{data}}" class="form-control" placeholder="Input is disabled" disabled>
 								</div>
 							</div>
-							<!-- Vendor Name -->
+							<!-- Product Name -->
 							<div class="form-group">
-								<label class="col-md-3 control-label">Vendor Name</label>
+								<label class="col-md-3 control-label">Product Name</label>
 								<div class="col-md-9">
-									<input type="text" class="form-control" name="vendor_name" placeholder="Vendor Name" required>
+									{% comment %} <input type="text" class="form-control" name="name" placeholder="Product Name" required> {% endcomment %}
+                                    <select name="product_name" id="customer-type" class="dropdown" required>
+                                        <option value="" disabled selected>Select an option</option>
+                                        {% for prod in products %}
+                                        <option value="{{prod.Product_Name}}">{{prod.Product_Name}}</option>
+                                        {% endfor %}
+                                    </select>
 								</div>
 							</div>
 
-							<!-- Vendor Phone No. -->
+							<!-- Category Name -->
 							<div class="form-group">
-								<label class="col-md-3 control-label">Vendor Phone No.</label>
+								<label class="col-md-3 control-label">Category Name</label>
 								<div class="col-md-9">
-									<input type="text" class="form-control" placeholder="Vendor Phone No." name="vendor_phone" required>
-									{% comment %} <p class="text-danger text-right xsmall">Phone</p> {% endcomment %}
+									<input type="text" class="form-control" step="any" placeholder="Category Name" id="category_name" name="category_name" required>
 								</div>
 							</div>
 							
-							<!-- Vendor GST-->
+							<!-- Sub-Category -->
 							<div class="form-group">
-								<label class="col-md-3 control-label">Vendor GST</label>
+								<label class="col-md-3 control-label">Sub-Category</label>
 								<div class="col-md-9">
-									<input type="text" class="form-control" placeholder="Vendor GST" name="vendor_gst" required>
+									<input type="text" class="form-control" placeholder="Sub-Category" name="sub_category" required >
+									<span class="alert-danger">add "None" if no Sub-category</span>
 								</div>
-							</div>
-							<!-- Invoice Cost -->
-							<div class="form-group">
-								<label class="col-md-3 control-label">Invoice Cost</label>
-								<div class="col-md-9">
-									<input type="number" class="form-control" placeholder="Invoice Cost" name="invoice_cost" required>
-								</div>
-							</div>
-							<!-- Invoice Quantity -->
-							<div class="form-group">
-								<label class="col-md-3 control-label">Invoice Quantity</label>
-								<div class="col-md-9">
-									<input type="number" class="form-control" placeholder="Invoice Quantity" name="invoice_quantity" required>
-								</div>
-							</div>
-							<!-- Batch No. -->
-							<div class="form-group">
-								<label class="col-md-3 control-label">Batch No.</label>
-								<div class="col-md-9">
-									<input type="text" class="form-control" placeholder="Batch No." name="batch_no" required>
-								</div>
-							</div>
-							<!-- Batch Id -->
-							<div class="form-group">
-								<label class="col-md-3 control-label">Batch Id</label>
-								<div class="col-md-9">
-									<input type="text"  value="{{bat_id}}" class="form-control" placeholder="Batch Id" name="batch_id" readonly required >
-								</div>
-							</div>
-							
-							<!-- Additional Information -->
-							<div class="form-group">
-								<label class="col-md-3 control-label">Additional Information</label>
-								<div class="col-md-9">
-									<textarea rows="3" class="form-control resize-v" placeholder="Additional Information" name="additional_info" required></textarea>
-								</div>
-							</div>
-							
+							</div>							
 							
 							
 							<div class="clearfix right">
-								<button class="btn btn-primary mr5" type="submit">Submit</button>
+								<button class="btn btn-primary mr5" type="submit" id="submitButton">Submit</button>
 							</div>
 							
 						</form>
@@ -379,5 +377,16 @@
 	<script src="{% static 'scripts/app.js' %}"></script>
 	<script src="{% static 'scripts/index.init.js' %}"></script>
 
+	
+
+
+	<script>
+		document.getElementById("form").addEventListener("submit", function(event) {
+			if (!confirm("The form is submitting.....")) {
+				event.preventDefault();  // Stop redirection
+			}
+		});
+	</script>
+	
 </body>
 </html>

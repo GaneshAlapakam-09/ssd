@@ -184,7 +184,7 @@
 			<!-- col-left -->
 			<div class="col-sm-12 col-md-11">
 				<div class="panel panel-default panel-hovered panel-stacked mb30">
-					<div class="panel-heading">Add Inward</div>
+					<div class="panel-heading">Add Product</div>
 					{% if messages %}
 
         {% for message in messages %}
@@ -195,90 +195,43 @@
         
         {% endif %}
 					<div class="panel-body">
-						<form  class="form-horizontal"  method="POST">
+						<form id='form' class="form-horizontal"  method="POST">
 							{% csrf_token %}
 							 <!-- form horizontal acts as a row -->
-							<!-- Material Id -->
+							<!-- Product Id -->
 							<div class="form-group">
-								<label class="col-md-3 control-label">Material Id</label>
-                                {% for item in mat_id %}
+								<label class="col-md-3 control-label">Product Id </label>
 								<div class="col-md-9">
-                                        <input type="text" value="{{ item.Material_Id }}" name='material_id' class="form-control" placeholder="Material Id" readonly>
-                                </div>
-                                {% endfor %}
-							</div>
-							<!-- Inward Id -->
-							<div class="form-group">
-								<label class="col-md-3 control-label">Inward Id</label>
-								<div class="col-md-9">
-									<input type="text" value="{{inw_id}}" class="form-control" placeholder="Inward Id" name='inward_id' readonly>
+									<input type="text" value="{{data}}" class="form-control" placeholder="Input is disabled" disabled>
 								</div>
 							</div>
-							<!-- Vendor Name -->
+							<!-- Product Name -->
 							<div class="form-group">
-								<label class="col-md-3 control-label">Vendor Name</label>
+								<label class="col-md-3 control-label">Product Name</label>
 								<div class="col-md-9">
-									<input type="text" class="form-control" name="vendor_name" placeholder="Vendor Name" required>
+									<input type="text" class="form-control" name="name" placeholder="Product Name" required>
 								</div>
 							</div>
 
-							<!-- Vendor Phone No. -->
+							<!-- GST -->
 							<div class="form-group">
-								<label class="col-md-3 control-label">Vendor Phone No.</label>
+								<label class="col-md-3 control-label">GST in %</label>
 								<div class="col-md-9">
-									<input type="text" class="form-control" placeholder="Vendor Phone No." name="vendor_phone" required>
-									{% comment %} <p class="text-danger text-right xsmall">Phone</p> {% endcomment %}
+									<input type="number" class="form-control" step="any" placeholder="GST in %" id="gst" name="gst" required>
 								</div>
 							</div>
 							
-							<!-- Vendor GST-->
+							<!-- HSN CODE -->
 							<div class="form-group">
-								<label class="col-md-3 control-label">Vendor GST</label>
+								<label class="col-md-3 control-label">HSN CODE</label>
 								<div class="col-md-9">
-									<input type="text" class="form-control" placeholder="Vendor GST" name="vendor_gst" required>
+									<input type="text" class="form-control" placeholder="HSN CODE" name="hsn" required >
 								</div>
-							</div>
-							<!-- Invoice Cost -->
-							<div class="form-group">
-								<label class="col-md-3 control-label">Invoice Cost</label>
-								<div class="col-md-9">
-									<input type="number" class="form-control" placeholder="Invoice Cost" name="invoice_cost" required>
-								</div>
-							</div>
-							<!-- Invoice Quantity -->
-							<div class="form-group">
-								<label class="col-md-3 control-label">Invoice Quantity</label>
-								<div class="col-md-9">
-									<input type="number" class="form-control" placeholder="Invoice Quantity" name="invoice_quantity" required>
-								</div>
-							</div>
-							<!-- Batch No. -->
-							<div class="form-group">
-								<label class="col-md-3 control-label">Batch No.</label>
-								<div class="col-md-9">
-									<input type="text" class="form-control" placeholder="Batch No." name="batch_no" required>
-								</div>
-							</div>
-							<!-- Batch Id -->
-							<div class="form-group">
-								<label class="col-md-3 control-label">Batch Id</label>
-								<div class="col-md-9">
-									<input type="text"  value="{{bat_id}}" class="form-control" placeholder="Batch Id" name="batch_id" readonly required >
-								</div>
-							</div>
-							
-							<!-- Additional Information -->
-							<div class="form-group">
-								<label class="col-md-3 control-label">Additional Information</label>
-								<div class="col-md-9">
-									<textarea rows="3" class="form-control resize-v" placeholder="Additional Information" name="additional_info" required></textarea>
-								</div>
-							</div>
-							
+							</div>							
 							
 							
 							<div class="clearfix right">
-								<button class="btn btn-primary mr5" type="submit">Submit</button>
+								<button class="btn btn-primary mr5" type="submit" id="submitButton">Submit</button>
 							</div>
 							
 						</form>
@@ -379,5 +332,49 @@
 	<script src="{% static 'scripts/app.js' %}"></script>
 	<script src="{% static 'scripts/index.init.js' %}"></script>
 
+	
+
+	{% comment %} <script>
+		// Example list of existing phone numbers (this can come from a database)
+		const existingPhoneNumbers = [
+			{% for num in phone %}
+			"{{num.Phone_No}}--{{num.Customer_Id}}--{{num.Customer_Name}}",
+			{% endfor %}
+		];
+		const submitButton = document.getElementById("submitButton");
+	
+		console.log(existingPhoneNumbers);
+	
+		document.getElementById("phone").addEventListener("blur", function () {
+			let enteredPhone = this.value.trim(); // Get input value and remove extra spaces
+			let errorSpan = document.getElementById("phoneError");
+	
+			if (enteredPhone.length !== 10 || isNaN(enteredPhone)) {
+				errorSpan.textContent = "Enter a valid 10-digit phone number";
+				errorSpan.style.color = "red";
+				this.style.borderColor = "red";
+				submitButton.disabled = true;
+				alert("Enter a valid 10-digit phone number");
+			} 
+			else {
+				// Check if the entered phone number exists in the array
+				let matchedPhone = existingPhoneNumbers.find(phone => phone.startsWith(enteredPhone));
+	
+				if (matchedPhone) {
+					errorSpan.textContent = `${matchedPhone} already exists!`;
+					errorSpan.style.color = "red";
+					this.style.borderColor = "red";
+					submitButton.disabled = true;
+					alert(`${matchedPhone} already exists!`);
+				} 
+				else {
+					errorSpan.textContent = "";
+					this.style.borderColor = "green";
+					submitButton.disabled = false;
+				}
+			}
+		});
+	</script>  {% endcomment %}
+	
 </body>
 </html>

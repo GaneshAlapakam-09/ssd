@@ -128,27 +128,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
-    BASE_DIR/'static'/'fonts'/'font-awesome',
-    BASE_DIR/'static'/'fonts'/'font-awesome'/'css',
-    BASE_DIR/'static'/'fonts'/'font-awesome'/'fonts',
-    BASE_DIR/'static'/'fonts'/'font-awesome'/'less',
-    BASE_DIR/'static'/'fonts'/'font-awesome'/'scss',
-    BASE_DIR/'static'/'fonts'/'ionicons',
-    BASE_DIR/'static'/'fonts'/'ionicons'/'css',
-    BASE_DIR/'static'/'fonts'/'ionicons'/'fonts',
-    BASE_DIR/'static'/'fonts'/'ionicons'/'less',
-    BASE_DIR/'static'/'fonts'/'ionicons'/'scss',
-    BASE_DIR/'static'/'images',
-    BASE_DIR/'static'/'images'/'bootstrap-colorpicker',
-    BASE_DIR/'static'/'images'/'flags',
-    BASE_DIR/'static'/'images'/'gallery',
-    BASE_DIR/'static'/'images'/'sample',
-    BASE_DIR/'static'/'scripts',
-    BASE_DIR/'static'/'scripts'/'ie',
-    BASE_DIR/'static'/'scripts'/'plugins',
+ 
     BASE_DIR/'static',
-    BASE_DIR/'static'/'styles'/'plugins',
-    BASE_DIR/'static'/'styles',
+
 ]
 
 

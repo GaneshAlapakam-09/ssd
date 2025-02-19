@@ -1,7 +1,9 @@
 from django.shortcuts import render,redirect
-from ssdapp.models import CustomerMaster,CustomerDetails,MaterialMaster,InwardMaster,City
+from ssdapp.models import CustomerMaster,CustomerDetails,MaterialMaster,InwardMaster,Invoice,ProductMaster,CategoriesMaster,CostMaster,BillingMaster
 from django.contrib import messages
-from django.http import JsonResponse
+
+from django.http import HttpResponse
+from weasyprint import HTML
 
 # Create your views here.
 
@@ -19,14 +21,20 @@ def addCustomer(request):
         else:
             new_id = "SSDC0001"
 
+        # phone_list = CustomerDetails.objects.filter(Status = 1).values('Phone_No')
+
+        # phone_no = int(phone) 
+        
+        # for num in phone_list:
+        #     if num["Phone_No"] == phone_no:
+        #         messages.info(request,"Phone Number  already exits")
+        #         return redirect('addcustomer')
+
         CustomerMaster.objects.create(Customer_Id = new_id, Customer_Name = name, Phone_No = phone)
         CustomerDetails.objects.create(Customer_Id = new_id, Customer_Name = name, Phone_No = phone, Alt_Phone = altPhone, Email = email, Address = address)
-        messages.info(request,"Form Submitted")
 
         return redirect('listcustomer')
-
-        
-
+ 
     last_customer = CustomerMaster.objects.order_by('-Customer_Id').first()
     if last_customer:
         last_id = int(last_customer.Customer_Id[4:])  # Extract the numeric part
@@ -34,7 +42,8 @@ def addCustomer(request):
     else:
         new_id = "SSDC0001"
     
-    context = {'data':new_id}
+    phone = CustomerDetails.objects.filter(Status = 1)
+    context = {'data':new_id, 'phone': phone}
 
     return render(request,'add_customer.html',context)
 
@@ -64,7 +73,7 @@ def editCustomer(request,id):
             altPhone = request.POST['alt_phone']
             email = request.POST['email']
             address = request.POST['address']
-            CustomerDetails.objects.filter(Customer_Id=customerId).update(Customer_Name = name, Phone_No = phone, Alt_Phone = altPhone, Email = email, Address = address)
+            CustomerDetails.objects.filter(Customer_Id=customerId).update(Alt_Phone = altPhone, Email = email, Address = address)
             return redirect('listcustomer')
 
     data = CustomerDetails.objects.filter(Customer_Id = id , Status =1)
@@ -72,7 +81,8 @@ def editCustomer(request,id):
     return render(request,'edit_customer.html',context)
 
 def deleteCustomer(request,id):
-    CustomerDetails.objects.filter(Customer_Id = id).delete()
+    CustomerDetails.objects.filter(Customer_Id = id).update(Status = 0)
+    CustomerMaster.objects.filter(Customer_Id = id).update(Status = 0)
     return redirect('listcustomer')
 
 
@@ -134,7 +144,7 @@ def materialDetails(request,id):
 
 
 def deleteMaterial(request,id):
-    MaterialMaster.objects.filter(Material_Id = id).delete()
+    MaterialMaster.objects.filter(Material_Id = id).update(Status = 0)
     return redirect('listmaterial')
 
 
@@ -151,12 +161,14 @@ def addInward(request, id):
         additional_info = request.POST['additional_info']
 
 
-        # Generate S.no
-        last_Sno = InwardMaster.objects.order_by('-S_No').first()
-        if last_Sno:
-            new_sno = last_Sno + 1
+        last_Sno = InwardMaster.objects.last()  # Get the last entry
+
+        if last_Sno:  
+            new_sno = last_Sno.S_No + 1  # Assuming 'Sno' is the integer field storing serial numbers
         else:
-            new_sno = 1
+            new_sno = 1  # Start from 1 if no records exist
+
+
         # Generate Inward_Id starting with INW0001 and store in back-end 
         last_inward = InwardMaster.objects.order_by('-Inward_Id').first()
         if last_inward:
@@ -179,7 +191,7 @@ def addInward(request, id):
             InwardMaster.objects.create(S_No = new_sno, Inward_Id = new_inw_id, Material_Id = material_id, Vendor_Name = vendor_name, Vendor_Mobile = vendor_phone, Vendor_GST = vendor_gst, Invoice_Cost = invoice_cost, Invoice_Quantity = invoice_quantity, Batch_No = batch_no, Batch_Id = new_bat_id, Additional_Info = additional_info)
         else:
             messages.info(request,"Material Id Not Available")
-        return render(request,'add_inward.html')
+        return redirect('listinward')
 
     
     mat_id = MaterialMaster.objects.filter(Material_Id = id , Status =1)
@@ -210,8 +222,208 @@ def listInward(request):
     context = {'data':data}
     return render(request,'list_inward.html',context)
 
+def inwardDetails(request,id):
+    data = InwardMaster.objects.filter(Inward_Id = id , Status =1)
+    context = {'data':data}
+    return render(request,'inward_details.html',context)
+
+
+def deleteInward(request,id):
+    InwardMaster.objects.filter(Inward_Id = id).update(Status = 0)
+    return redirect('listinward')
+
+
 
 def city_autocomplete(request):
+    data = CustomerDetails.objects.filter(Status = 1)
+    context = {'data':data}
+    # Invoice.objects.create(invoice_number = 1, customer_name = "Test", date = "25-10-2001", total_amount = 1000)
+
+    return render(request,'auto_complete.html', context)
 
 
-    return render(request,'auto_complete.html')
+def generate_invoice_pdf(request, invoice_id):
+    invoice = Invoice.objects.get(id=invoice_id)
+    html_string = render(request, 'invoice.html', {'invoice': invoice}).content.decode()
+    
+    pdf = HTML(string=html_string).write_pdf()
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="invoice_{invoice.invoice_number}.pdf"'
+    
+    return response
+
+
+
+
+
+def addProduct(request):
+    if request.method == 'POST':
+        name = request.POST['name']
+        gst = request.POST['gst']
+        hsn = request.POST['hsn']
+        last_product = ProductMaster.objects.order_by('-Product_Id').first()
+        if last_product:
+            last_id = int(last_product.Product_Id[4:])  # Extract the numeric part
+            new_id = f"PROD{last_id + 1:04d}"
+        else:
+            new_id = "PROD0001"
+
+        ProductMaster.objects.create(Product_Id = new_id, Product_Name = name, GST = gst, HSN_Code = hsn)
+
+        return redirect('addproduct')
+    
+    last_product = ProductMaster.objects.order_by('-Product_Id').first()
+    if last_product:
+        last_id = int(last_product.Product_Id[4:])  # Extract the numeric part
+        new_id = f"PROD{last_id + 1:04d}"
+    else:
+        new_id = "PROD0001"
+    
+    context = {'data':new_id}
+
+    return render(request,'add_product.html',context)
+
+
+def listProduct(request):
+    data = ProductMaster.objects.filter(Status = 1)
+    context = {'data':data}
+    return render(request,'list_product.html',context)
+
+
+
+
+
+
+def addCategories(request):
+    if request.method == 'POST':
+        product_name = request.POST['product_name']
+        category_name = request.POST['category_name']
+        sub_category = request.POST['sub_category']
+        
+        last_categories = CategoriesMaster.objects.order_by('-Categories_Id').first()
+        if last_categories:
+            last_id = int(last_categories.Categories_Id[3:])  # Extract the numeric part
+            new_id = f"CAT{last_id + 1:04d}"
+        else:
+            new_id = "CAT0001"
+            
+        CategoriesMaster.objects.create(Categories_Id = new_id, Product_Name = product_name, Categories_Name = category_name, Sub_Categories = sub_category)
+
+        return redirect('addcategories')
+
+    last_categories = CategoriesMaster.objects.order_by('-Categories_Id').first()
+    if last_categories:
+        last_id = int(last_categories.Categories_Id[3:])  # Extract the numeric part
+        new_id = f"CAT{last_id + 1:04d}"
+    else:
+        new_id = "CAT0001"
+
+    products = ProductMaster.objects.filter(Status = 1)
+    
+    context = {'data':new_id, 'products':products}
+
+    return render(request,'add_categories.html',context)
+
+
+def listCategories(request):
+    data = CategoriesMaster.objects.filter(Status = 1)
+    context = {'data':data}
+    return render(request,'list_categories.html',context)
+
+
+
+def addCost(request):
+    if request.method == "POST":
+        product_name = request.POST['product_name']
+        category_name = request.POST['category_name']
+        sub_category = request.POST['sub_category']
+        cost_calculate = request.POST['cost_calculate']
+        cost = request.POST['cost']
+
+        last_product = CostMaster.objects.order_by('-Cost_Id').first()
+        if last_product:
+            last_id = int(last_product.Cost_Id[4:])  # Extract the numeric part
+            new_id = f"COST{last_id + 1:04d}"
+        else:
+            new_id = "COST0001"
+
+        if cost_calculate == "Cost Per Unit":
+            CostMaster.objects.create(Cost_Id = new_id, Product_Name = product_name, Category_Name = category_name, Sub_Category = sub_category, Cost_Per_Unit_Status = 1, Cost_Per_Unit = cost)
+            return redirect('addcost')
+        else:
+            CostMaster.objects.create(Cost_Id = new_id, Product_Name = product_name, Category_Name = category_name, Sub_Category = sub_category, Cost_Per_Sqft_Status = 1, Cost_Per_Sqft = cost)
+            return redirect('addcost')
+        
+    last_product = CostMaster.objects.order_by('-Cost_Id').first()
+    if last_product:
+        last_id = int(last_product.Cost_Id[4:])  # Extract the numeric part
+        new_id = f"COST{last_id + 1:04d}"
+    else:
+        new_id = "COST0001"
+
+    category = CategoriesMaster.objects.filter(Status = 1)
+    products = ProductMaster.objects.filter(Status = 1)
+        
+    context = {'data':new_id, 'category':category, 'products':products}
+
+
+    return render(request,'add_cost.html',context)
+
+
+def listCost(request):
+    data = CostMaster.objects.filter(Status =1)
+    context = {'data':data}
+    return render(request,'list_cost.html',context)
+
+
+def bill(request):
+    if request.method == "POST":
+        customer_details = request.POST['customer_hidden']
+        splitted_details = customer_details.strip().split("--")
+        customer_id = splitted_details[0]
+        customer_name = splitted_details[1]
+        customer_phone = splitted_details[2]
+        product_name = request.POST['product_name']
+        category_name = request.POST['category_name']
+        sub_category = request.POST['sub_category']
+        quantity = request.POST['quantity']
+        cost = request.POST['cost']
+        gst = request.POST['gst']
+        hsn = request.POST['hsn']
+        total = request.POST['total']
+        total_with_gst = request.POST['total_with_gst']
+        last_bill = BillingMaster.objects.order_by('-Bill_Id').first()
+        if last_bill:
+            last_id = int(last_bill.Bill_Id[4:])  # Extract the numeric part
+            new_id = f"BILL{last_id + 1:04d}"
+        else:
+            new_id = "BILL0001"
+        if request.POST['length']:
+            length = request.POST['length']
+            width = request.POST['width']
+            BillingMaster.objects.create(Bill_Id = new_id, Customer_Id = customer_id, Customer_Name = customer_name, Phone_No = customer_phone,Product_Name = product_name, Category_Name = category_name, Sub_Category = sub_category, Length = length, Width = width, Quantity = quantity, Cost_Per_Quantity = cost, GST = gst, HSN_Code = hsn, Total_Cost = total, Total_Cost_With_Gst = total_with_gst)
+            return redirect('bill')
+        else:
+            BillingMaster.objects.create(Bill_Id = new_id, Customer_Id = customer_id, Customer_Name = customer_name, Phone_No = customer_phone,Product_Name = product_name, Category_Name = category_name, Sub_Category = sub_category, Quantity = quantity, Cost_Per_Quantity = cost, GST = gst, HSN_Code = hsn, Total_Cost = total, Total_Cost_With_Gst = total_with_gst)
+            return redirect('bill')
+
+
+
+
+
+    last_bill = BillingMaster.objects.order_by('-Bill_Id').first()
+    if last_bill:
+        last_id = int(last_bill.Bill_Id[4:])  # Extract the numeric part
+        new_id = f"BILL{last_id + 1:04d}"
+    else:
+        new_id = "BILL0001"
+
+    data = CustomerDetails.objects.filter(Status = 1)
+    category = CategoriesMaster.objects.filter(Status = 1)
+    products = ProductMaster.objects.filter(Status = 1)
+    cos = CostMaster.objects.filter(Status = 1)
+        
+    context = {'new_id':new_id, 'category':category, 'products':products, 'data': data, 'cos': cos, 'new_id': new_id }
+
+
+    return render(request,'bill.html',context)

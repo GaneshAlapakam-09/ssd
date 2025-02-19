@@ -14,5 +14,18 @@ urlpatterns = [
     path('deletematerial/<str:id>',views.deleteMaterial,name='deletematerial'),
     path('addinward/<str:id>',views.addInward,name='addinward'),
     path('listinward/',views.listInward,name='listinward'),
+    path('inwarddetails/<str:id>',views.inwardDetails,name='inwarddetails'),
+    path('deleteinward/<str:id>',views.deleteInward,name='deleteinward'),
     path('autocomplete/',views.city_autocomplete,name='autocomplete'),
+    path('invoice/<int:invoice_id>/pdf/', views.generate_invoice_pdf, name='generate_invoice_pdf'),
+    path('addproduct/',views.addProduct,name='addproduct'),
+    path('listproduct/',views.listProduct,name='listproduct'),
+    path('addcategories/',views.addCategories,name='addcategories'),
+    path('listcategories/',views.listCategories,name='listcategories'),
+    path('addcost/',views.addCost,name='addcost'),
+    path('listcost/',views.listCost,name='listcost'),
+    path('bill/',views.bill,name='bill'),
+
 ]
+
+

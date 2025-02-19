@@ -11,12 +11,13 @@
 
 	<title>SSD</title>
 	
-	{% load static %}
+
 
 
 
 
 {% load static %}
+<link rel="icon" type="image/x-icon" href="{% static 'images/SS_LOGO.png' %}">
 
 <!-- Icons -->
 <link rel="stylesheet" href="{% static 'fonts/ionicons/css/ionicons.min.css' %}">
@@ -83,7 +84,8 @@
 			<div class="nav-head">
 				<!-- site logo -->
 				<a class="site-logo text-uppercase">
-					<i class="ion ion-disc"></i>
+					{% comment %} <i class="ion ion-disc"></i> {% endcomment %}
+					<img src="{% static 'images/SS_LOGO.png' %}" alt="">
 					<span class="text">SS Digitals</span>
 				</a>
 			</div>
@@ -101,6 +103,12 @@
 							<span class="text">Dashboard</span>
 						</a>
 					</li>
+					{% comment %} <li>
+						<a>
+							<i class="icon ion-md-people"></i>
+							<span class="text">Customer Management</span>
+						</a>
+					</li> {% endcomment %}
 					<li>
 						<a href="javascript:;">
 							<i class="icon ion-md-people"></i>
@@ -110,7 +118,6 @@
 						<ul class="inner-drop list-unstyled">
 							<li><a href="{% url "addcustomer" %}">Add Customer</a></li>
 							<li><a href="{% url "listcustomer" %}">List Customer</a></li>
-
 						</ul>
 					</li>
 					<li>
@@ -135,7 +142,39 @@
 							<li><a href="{% url "listinward" %}">List Inward</a></li>
 						</ul>
 					</li>
-                    
+					<li>
+						<a href="javascript:;">
+							<i class="icon ion-md-albums"></i>
+							<span class="text">Product Management</span>
+							{% comment %} <i class="icon ion-md-arrow"></i> {% endcomment %}
+						</a>
+						<ul class="inner-drop list-unstyled">
+							<li><a href="{% url "addproduct" %}">Add Product</a></li>
+							<li><a href="{% url "listproduct" %}">List Product</a></li>
+						</ul>
+					</li>
+					<li>
+						<a href="javascript:;">
+							<i class="icon ion-md-apps"></i>
+							<span class="text">Category Management</span>
+							{% comment %} <i class="icon ion-md-arrow"></i> {% endcomment %}
+						</a>
+						<ul class="inner-drop list-unstyled">
+							<li><a href="{% url "addcategories" %}">Add Category</a></li>
+							<li><a href="{% url "listcategories" %}">List Category</a></li>
+						</ul>
+					</li>
+					<li>
+						<a href="javascript:;">
+							<i class="icon ion-md-cash"></i>
+							<span class="text">Cost Management</span>
+							{% comment %} <i class="icon ion-md-arrow"></i> {% endcomment %}
+						</a>
+						<ul class="inner-drop list-unstyled">
+							<li><a href="{% url "addcost" %}">Add Cost</a></li>
+							<li><a href="{% url "listcost" %}">List Cost</a></li>
+						</ul>
+					</li>
 
 					
 					
@@ -309,19 +348,6 @@
 
 	<!-- Dev only -->
 	<!-- Vendors -->
-	{% comment %} {% load static %}
-
-	<script src="{% static 'scripts/vendors.js' %}"></script>
-	<script src="{% static 'scripts/d3.min.js' %}"></script>
-	<script src="{% static 'scripts/c3.min.js' %}"></script>
-	<script src="{% static 'scripts/screenfull.js' %}"></script>
-	<script src="{% static 'scripts/perfect_scrollbar.min.js' %}"></script>
-	<script src="{% static 'scripts/waves.min.js' %}"></script>
-	<script src="{% static 'scripts/jquery.sparkline.min.js' %}"></script>
-	<script src="{% static 'scripts/jquery.easypiechart.min.js' %}"></script>
-	<script src="{% static 'scripts/bootstrap_rating.min.js' %}"></script>
-	<script src="{% static 'scripts/app.js' %}"></script>
-	<script src="{% static 'scripts/index.init.js' %}"></script> {% endcomment %}
 
 	{% load static %}
 
