@@ -122,6 +122,17 @@
 				</li>
 				<li>
 					<a href="javascript:;">
+						<i class="icon ion-md-contact"></i>
+						<span class="text">Employee Management</span>
+						{% comment %} <i class="icon ion-md-arrow"></i> {% endcomment %}
+					</a>
+					<ul class="inner-drop list-unstyled">
+						<li><a href="{% url "addemployee" %}">Add Cost</a></li>
+						<li><a href="{% url "listemployee" %}">List Cost</a></li>
+					</ul>
+				</li>
+				<li>
+					<a href="javascript:;">
 						<i class="icon ion-md-cube"></i>
 						<span class="text">Material Management</span>
 						{% comment %} <i class="icon ion-md-arrow"></i> {% endcomment %}
@@ -173,6 +184,19 @@
 					<ul class="inner-drop list-unstyled">
 						<li><a href="{% url "addcost" %}">Add Cost</a></li>
 						<li><a href="{% url "listcost" %}">List Cost</a></li>
+					</ul>
+				</li>
+				<li>
+					<a href="javascript:;">
+						<i class="icon ion-md-paper"></i>
+						<span class="text">Billing Management</span>
+						{% comment %} <i class="icon ion-md-arrow"></i> {% endcomment %}
+					</a>
+					<ul class="inner-drop list-unstyled">
+						<li><a href="{% url "bill" %}">Add Bill</a></li>
+						<li><a href="{% url "listbill" %}">List Bill</a></li>
+						<li><a href="{% url "listquote" %}">List Quotation</a></li>
+						<li><a href="{% url "listestimate" %}">List Estimation</a></li>
 					</ul>
 				</li>
 

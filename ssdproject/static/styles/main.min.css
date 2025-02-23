@@ -1837,6 +1837,10 @@ fieldset[disabled] .btn-youtube.active {
   -o-transform: translate(0, 3px);
   transform: translate(0, 3px);
 }
+
+th,td {
+  white-space: nowrap;
+}
 .table thead th > .th > [class*='icon'] {
   cursor: pointer;
   position: absolute;
@@ -3443,7 +3447,7 @@ fieldset[disabled] .btn-youtube.active {
   margin: 0!important;
 }
 .no-btn-gap-h {
-  magin-right: 0!important;
+  margin-right: 0!important;
 }
 .page-ui-icons .icons-list li {
   display: inline-block;

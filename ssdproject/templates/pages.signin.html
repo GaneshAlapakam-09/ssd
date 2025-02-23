@@ -9,19 +9,19 @@
 	<meta name="author" content="solutionportal">
 	<!-- <base href="/"> -->
 
-	<title>Materia - Admin Template</title>
-	
+	<title>Signin</title>
+	{% load static %}
 	<!-- Icons -->
-	<link rel="stylesheet" href="fonts/ionicons/css/ionicons.min.css">
-	<link rel="stylesheet" href="fonts/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" href="{% static "fonts/ionicons/css/ionicons.min.css" %}">
+	<link rel="stylesheet" href="{% static "fonts/font-awesome/css/font-awesome.min.css" %}">
 
 	<!-- Plugins -->
-	<link rel="stylesheet" href="styles/plugins/waves.css">
-	<link rel="stylesheet" href="styles/plugins/perfect-scrollbar.css">
+	<link rel="stylesheet" href="{% static "styles/plugins/waves.css" %}">
+	<link rel="stylesheet" href="{% static "styles/plugins/perfect-scrollbar.css" %}">
 	
 	<!-- Css/Less Stylesheets -->
-	<link rel="stylesheet" href="styles/bootstrap.min.css">
-	<link rel="stylesheet" href="styles/main.min.css">
+	<link rel="stylesheet" href="{% static "styles/bootstrap.min.css" %}">
+	<link rel="stylesheet" href="{% static "styles/main.min.css" %}">
 
 
 	 
@@ -41,6 +41,15 @@
 		
 		<!-- content-here -->
 		<div class="content-container" id="content">
+			{% if messages %}
+
+        {% for message in messages %}
+        <script type="text/javascript">
+            alert('{{ message }}');
+        </script>
+        {% endfor %}
+        
+        {% endif %}
 			<div class="page page-auth">
 				<div class="auth-container">
 
@@ -50,38 +59,39 @@
 					</div>
 
 					<div class="form-container">
-						<form class="form-horizontal" action="javascript:;">
+						<form class="form-horizontal" method="POST">
+							{% csrf_token %}
 							<div class="md-input-container md-float-label">
-								<input type="email"  class="md-input">
-								<label>Email Id</label>
+								<input type="text"  class="md-input" name="username" required>
+								<label>Username</label>
 							</div>
 
 							<div class="md-input-container md-float-label">
-								<input type="password"  class="md-input">
+								<input type="password"  class="md-input" name="password" required>
 								<label>Password</label>
 							</div>
 
-							<div class="clearfix">
+							<!--<div class="clearfix">
 								<div class="ui-checkbox ui-checkbox-primary right">
 									<label>
 										<input type="checkbox"> 
 										<span>Remember me</span>
 									</label>
 								</div>
-							</div>
-							<div class="clearfix mb15"><a href="forget-pass.html" class="text-success small">Forget your password?</a></div>
+							</div>-->
+							<!--<div class="clearfix mb15"><a href="forget-pass.html" class="text-success small">Forget your password?</a></div>-->
 							<div class="btn-group btn-group-justified mb15">
-								<div class="btn-group">
+								<!--<div class="btn-group">
 									<button type="button" class="btn btn-facebook"><span class="ion ion-social-facebook"></span>&nbsp;&nbsp;Facebook</button>
-								</div>
+								</div>-->
 								<div class="btn-group">
 									<button type="submit" class="btn btn-success">Sign In</button>
 								</div>
 							</div> 
-							<div class="clearfix text-center small">
+							<!-- <div class="clearfix text-center small">
 								<p>Don't have an account? <a href="signup.html">Create Now</a></p>
-							</div>
-						</form>
+							</div> -->
+						</form> 
 					</div>
 
 				</div> <!-- #end signin-container -->

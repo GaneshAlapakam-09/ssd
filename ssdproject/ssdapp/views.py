@@ -1,12 +1,51 @@
+import traceback
 from django.shortcuts import render,redirect
-from ssdapp.models import CustomerMaster,CustomerDetails,MaterialMaster,InwardMaster,Invoice,ProductMaster,CategoriesMaster,CostMaster,BillingMaster
+from ssdapp.models import CustomerMaster,CustomerDetails,MaterialMaster,InwardMaster,Invoice,ProductMaster,CategoriesMaster,CostMaster,BillingMaster,QuoteMaster, EstimateMaster, BillingDetails, QuoteDetails, EstimateDetails
 from django.contrib import messages
 
 from django.http import HttpResponse
 from weasyprint import HTML
 
+
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
+
+from django.contrib.auth.hashers import make_password
+from .models import Employee
+from django.contrib.auth.decorators import login_required, user_passes_test
+
+from django.contrib.auth import authenticate,login,logout
+
+from datetime import datetime,date,timedelta
+
 # Create your views here.
 
+       
+def is_admin(user):
+    return user.is_authenticated and user.role == 'admin'
+def is_employee(user):
+    return user.is_authenticated and user.role == 'employee'
+
+
+
+def signin(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(username = username,password = password)
+        if user is not None:
+            login(request,user)
+            return redirect('addcustomer')
+        else:
+            messages.info(request,"username and password not match")
+            return redirect('signin')
+    return render(request,'pages.signin.html')
+
+
+
+@login_required(login_url='signin')
 def addCustomer(request):
     if request.method == 'POST':
         name = request.POST['name']
@@ -46,13 +85,13 @@ def addCustomer(request):
     context = {'data':new_id, 'phone': phone}
 
     return render(request,'add_customer.html',context)
-
+@login_required(login_url='signin')
 def listCustomer(request):
     data = CustomerDetails.objects.filter(Status = 1)
     context = {'data':data}
     return render(request,'list_customer.html',context)
 
-
+@login_required(login_url='signin')
 def customerDetails(request,id):
     data = CustomerDetails.objects.filter(Customer_Id = id , Status =1)
     context = {'data':data}
@@ -63,7 +102,7 @@ def customerDetails(request,id):
 #     data = CustomerDetails.objects.filter(Status=1)
 #     context = {'data':data}
 #     return render(request,'edit_customer_s.html',context)
-
+@login_required(login_url='signin')
 def editCustomer(request,id):
     if request.method == 'POST':
         if request.method == 'POST':
@@ -79,13 +118,14 @@ def editCustomer(request,id):
     data = CustomerDetails.objects.filter(Customer_Id = id , Status =1)
     context = {'data':data}
     return render(request,'edit_customer.html',context)
-
+@login_required(login_url='signin')
 def deleteCustomer(request,id):
     CustomerDetails.objects.filter(Customer_Id = id).update(Status = 0)
     CustomerMaster.objects.filter(Customer_Id = id).update(Status = 0)
     return redirect('listcustomer')
 
-
+@login_required(login_url='signin')
+@user_passes_test(is_admin)  # Only admin can add employees
 def addMaterial(request):
     if request.method == "POST":
         material_name = request.POST['name']
@@ -116,13 +156,15 @@ def addMaterial(request):
     context = {'data':new_id}
     return render(request,'add_material.html',context)
 
-
+@login_required(login_url='signin')
+@user_passes_test(is_admin)  # Only admin can add employees
 def listMaterial(request):
     data = MaterialMaster.objects.filter(Status = 1)
     context = {'data':data}
     return render(request,'list_material.html',context)
 
-
+@login_required(login_url='signin')
+@user_passes_test(is_admin)  # Only admin can add employees
 def editMaterial(request,id):
     if request.method == "POST":
         material_name = request.POST['name']
@@ -136,19 +178,22 @@ def editMaterial(request,id):
     context = {'data':data}
     return render(request,'edit_material.html',context)
 
-
+@login_required(login_url='signin')
+@user_passes_test(is_admin)  # Only admin can add employees
 def materialDetails(request,id):
     data = MaterialMaster.objects.filter(Material_Id = id , Status =1)
     context = {'data':data}
     return render(request,'material_details.html',context)
 
-
+@login_required(login_url='signin')
+@user_passes_test(is_admin)  # Only admin can add employees
 def deleteMaterial(request,id):
     MaterialMaster.objects.filter(Material_Id = id).update(Status = 0)
     return redirect('listmaterial')
 
 
-
+@login_required(login_url='signin')
+@user_passes_test(is_admin)  # Only admin can add employees
 def addInward(request, id):
     if request.method == 'POST':
         material_id = request.POST['material_id']
@@ -216,18 +261,24 @@ def addInward(request, id):
     
     return render(request,'add_inward.html', context)
 
-
+@login_required(login_url='signin')
+@user_passes_test(is_admin)  # Only admin can add employees
 def listInward(request):
     data = InwardMaster.objects.filter(Status = 1)
     context = {'data':data}
     return render(request,'list_inward.html',context)
 
+@login_required(login_url='signin')
+@user_passes_test(is_admin)  # Only admin can add employees
 def inwardDetails(request,id):
     data = InwardMaster.objects.filter(Inward_Id = id , Status =1)
     context = {'data':data}
     return render(request,'inward_details.html',context)
 
 
+
+@login_required(login_url='signin')
+@user_passes_test(is_admin)  # Only admin can add employees
 def deleteInward(request,id):
     InwardMaster.objects.filter(Inward_Id = id).update(Status = 0)
     return redirect('listinward')
@@ -235,6 +286,7 @@ def deleteInward(request,id):
 
 
 def city_autocomplete(request):
+    return render(request, 'invoice.html')
     data = CustomerDetails.objects.filter(Status = 1)
     context = {'data':data}
     # Invoice.objects.create(invoice_number = 1, customer_name = "Test", date = "25-10-2001", total_amount = 1000)
@@ -245,7 +297,6 @@ def city_autocomplete(request):
 def generate_invoice_pdf(request, invoice_id):
     invoice = Invoice.objects.get(id=invoice_id)
     html_string = render(request, 'invoice.html', {'invoice': invoice}).content.decode()
-    
     pdf = HTML(string=html_string).write_pdf()
     response = HttpResponse(pdf, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="invoice_{invoice.invoice_number}.pdf"'
@@ -255,7 +306,8 @@ def generate_invoice_pdf(request, invoice_id):
 
 
 
-
+@login_required(login_url='signin')
+@user_passes_test(is_admin)  # Only admin can add employees
 def addProduct(request):
     if request.method == 'POST':
         name = request.POST['name']
@@ -283,7 +335,8 @@ def addProduct(request):
 
     return render(request,'add_product.html',context)
 
-
+@login_required(login_url='signin')
+@user_passes_test(is_admin)  # Only admin can add employees
 def listProduct(request):
     data = ProductMaster.objects.filter(Status = 1)
     context = {'data':data}
@@ -293,7 +346,8 @@ def listProduct(request):
 
 
 
-
+@login_required(login_url='signin')
+@user_passes_test(is_admin)  # Only admin can add employees
 def addCategories(request):
     if request.method == 'POST':
         product_name = request.POST['product_name']
@@ -324,14 +378,16 @@ def addCategories(request):
 
     return render(request,'add_categories.html',context)
 
-
+@login_required(login_url='signin')
+@user_passes_test(is_admin)  # Only admin can add employees
 def listCategories(request):
     data = CategoriesMaster.objects.filter(Status = 1)
     context = {'data':data}
     return render(request,'list_categories.html',context)
 
 
-
+@login_required(login_url='signin')
+@user_passes_test(is_admin)  # Only admin can add employees
 def addCost(request):
     if request.method == "POST":
         product_name = request.POST['product_name']
@@ -369,47 +425,63 @@ def addCost(request):
 
     return render(request,'add_cost.html',context)
 
-
+@login_required(login_url='signin')
+@user_passes_test(is_admin)  # Only admin can add employees
 def listCost(request):
     data = CostMaster.objects.filter(Status =1)
     context = {'data':data}
     return render(request,'list_cost.html',context)
 
-
+@login_required(login_url='signin')
 def bill(request):
+    # for adding multiple form entry in db 
     if request.method == "POST":
-        customer_details = request.POST['customer_hidden']
-        splitted_details = customer_details.strip().split("--")
-        customer_id = splitted_details[0]
-        customer_name = splitted_details[1]
-        customer_phone = splitted_details[2]
-        product_name = request.POST['product_name']
-        category_name = request.POST['category_name']
-        sub_category = request.POST['sub_category']
-        quantity = request.POST['quantity']
-        cost = request.POST['cost']
-        gst = request.POST['gst']
-        hsn = request.POST['hsn']
-        total = request.POST['total']
-        total_with_gst = request.POST['total_with_gst']
-        last_bill = BillingMaster.objects.order_by('-Bill_Id').first()
-        if last_bill:
-            last_id = int(last_bill.Bill_Id[4:])  # Extract the numeric part
-            new_id = f"BILL{last_id + 1:04d}"
-        else:
-            new_id = "BILL0001"
-        if request.POST['length']:
-            length = request.POST['length']
-            width = request.POST['width']
-            BillingMaster.objects.create(Bill_Id = new_id, Customer_Id = customer_id, Customer_Name = customer_name, Phone_No = customer_phone,Product_Name = product_name, Category_Name = category_name, Sub_Category = sub_category, Length = length, Width = width, Quantity = quantity, Cost_Per_Quantity = cost, GST = gst, HSN_Code = hsn, Total_Cost = total, Total_Cost_With_Gst = total_with_gst)
-            return redirect('bill')
-        else:
-            BillingMaster.objects.create(Bill_Id = new_id, Customer_Id = customer_id, Customer_Name = customer_name, Phone_No = customer_phone,Product_Name = product_name, Category_Name = category_name, Sub_Category = sub_category, Quantity = quantity, Cost_Per_Quantity = cost, GST = gst, HSN_Code = hsn, Total_Cost = total, Total_Cost_With_Gst = total_with_gst)
-            return redirect('bill')
-
-
-
-
+        try:
+            # Parse JSON data
+            data = json.loads(request.body)
+            entries = data.get("entries", [])
+            # Save each entry into the database
+            for entry in entries:
+                last_bill = BillingMaster.objects.order_by('-Bill_Id').first()
+                if last_bill:
+                    last_id = int(last_bill.Bill_Id[4:])  # Extract the numeric part
+                    new_id = f"BILL{last_id + 1:04d}"
+                else:
+                    new_id = "BILL0001"
+                detail_id = BillingMaster.objects.create(
+                    Bill_Id= new_id,
+                    Customer_Id=entry.get("customer_id"),
+                    Customer_Name=entry.get("customer_name"),
+                    Phone_No=entry.get("customer_phone"),
+                    Grand_Total = int(data.get("grand_total", 0)) if data.get("grand_total") not in [None, "", "None"] else 0,
+                    Grand_Total_With_Gst = int(data.get("grand_total_with_gst", 0)) if data.get("grand_total_with_gst") not in [None, "", "None"] else 0,
+                )
+                break
+            for entry in entries:
+                BillingDetails.objects.create(
+                    Bill_Id= detail_id,
+                    Customer_Id=entry.get("customer_id"),
+                    Customer_Name=entry.get("customer_name"),
+                    Phone_No=entry.get("customer_phone"),
+                    Product_Name=entry.get("product", "NONE") if entry.get("product") not in [None, "", "None"] else "NONE",
+                    Custom_Product=entry.get("custom", "NONE") if entry.get("custom") not in [None, "", "None"] else "NONE",
+                    Category_Name=entry.get("category", "NONE") if entry.get("category") not in [None, "", "None"] else "NONE",
+                    Sub_Category=entry.get("sub_category", "NONE") if entry.get("sub_category") not in [None, "", "None"] else "NONE",
+                    Length=int(entry.get("length", 0)) if entry.get("length") not in [None, "", "None"] else 0,
+                    Width=int(entry.get("width", 0)) if entry.get("width") not in [None, "", "None"] else 0,
+                    Quantity=int(entry.get("quantity", 0)),  # Convert to int (default 0 if missing)
+                    Cost_Per_Quantity=float(entry.get("cost", 0)) if entry.get("cost") not in [None, "", "None"] else 0,  # Convert to float (default 0 if missing)
+                    GST=float(entry.get("gst", 0)) if entry.get("gst") not in [None, "", "None"] else 0,  # Convert to float (default 0 if missing)
+                    HSN_Code=entry.get("hsn", "NONE") if entry.get("hsn") not in [None, "", "None"] else "NONE",
+                    Total_Cost=float(entry.get("total", 0)),  # Convert to float
+                    Total_Cost_With_Gst=float(entry.get("total_with_gst", 0))  # Convert to float
+                )
+            return redirect("listbill")
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON data"}, status=400)
+        except Exception as e:
+            traceback.print_exc()  # This prints the full error traceback in the console
+            return JsonResponse({"error": str(e)}, status=500)
 
     last_bill = BillingMaster.objects.order_by('-Bill_Id').first()
     if last_bill:
@@ -425,5 +497,224 @@ def bill(request):
         
     context = {'new_id':new_id, 'category':category, 'products':products, 'data': data, 'cos': cos, 'new_id': new_id }
 
-
+    
     return render(request,'bill.html',context)
+
+@login_required(login_url='signin')
+def listBill(request):
+    data = BillingMaster.objects.filter(Status =1)
+    context = {'data':data}
+    return render(request,'list_bill.html',context)
+
+
+@login_required(login_url='signin')
+def billDetails(request,id):
+    data = BillingDetails.objects.filter(Bill_Id = id , Status =1)
+    data2 = BillingMaster.objects.get(Bill_Id = id , Status =1)
+    context = {'data':data, 'data2':data2}
+    return render(request,'bill_details.html',context)
+
+
+
+
+@login_required(login_url='signin')
+def quote(request):
+    # for adding multiple form entry in db 
+    if request.method == "POST":
+        try:
+            # Parse JSON data
+            data = json.loads(request.body)
+            entries = data.get("entries", [])
+            # Save each entry into the database
+            for entry in entries:
+                last_bill = QuoteMaster.objects.order_by('-Quote_Id').first()
+                if last_bill:
+                    last_id = int(last_bill.Quote_Id[4:])  # Extract the numeric part
+                    new_id = f"QUOT{last_id + 1:04d}"
+                else:
+                    new_id = "QUOT0001"
+                detail_id = QuoteMaster.objects.create(
+                    Quote_Id= new_id,
+                    Customer_Id=entry.get("customer_id"),
+                    Customer_Name=entry.get("customer_name"),
+                    Phone_No=entry.get("customer_phone"),
+                    Grand_Total = int(data.get("grand_total", 0)) if data.get("grand_total") not in [None, "", "None"] else 0,
+                    Grand_Total_With_Gst = int(data.get("grand_total_with_gst", 0)) if data.get("grand_total_with_gst") not in [None, "", "None"] else 0,
+                )
+                break
+            for entry in entries:
+                QuoteDetails.objects.create(
+                    Quote_Id= detail_id,
+                    Customer_Id=entry.get("customer_id"),
+                    Customer_Name=entry.get("customer_name"),
+                    Phone_No=entry.get("customer_phone"),
+                    Product_Name=entry.get("product", "NONE") if entry.get("product") not in [None, "", "None"] else "NONE",
+                    Custom_Product=entry.get("custom", "NONE") if entry.get("custom") not in [None, "", "None"] else "NONE",
+                    Category_Name=entry.get("category", "NONE") if entry.get("category") not in [None, "", "None"] else "NONE",
+                    Sub_Category=entry.get("sub_category", "NONE") if entry.get("sub_category") not in [None, "", "None"] else "NONE",
+                    Length=int(entry.get("length", 0)) if entry.get("length") not in [None, "", "None"] else 0,
+                    Width=int(entry.get("width", 0)) if entry.get("width") not in [None, "", "None"] else 0,
+                    Quantity=int(entry.get("quantity", 0)),  # Convert to int (default 0 if missing)
+                    Cost_Per_Quantity=float(entry.get("cost", 0)) if entry.get("cost") not in [None, "", "None"] else 0,  # Convert to float (default 0 if missing)
+                    GST=float(entry.get("gst", 0)) if entry.get("gst") not in [None, "", "None"] else 0,  # Convert to float (default 0 if missing)
+                    HSN_Code=entry.get("hsn", "NONE") if entry.get("hsn") not in [None, "", "None"] else "NONE",
+                    Total_Cost=float(entry.get("total", 0)),  # Convert to float
+                    Total_Cost_With_Gst=float(entry.get("total_with_gst", 0))  # Convert to float
+                )
+            return redirect("listquote")
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON data"}, status=400)
+        except Exception as e:
+            traceback.print_exc()  # This prints the full error traceback in the console
+            return JsonResponse({"error": str(e)}, status=500)
+    return redirect('listquote')
+
+@login_required(login_url='signin')
+def listQuote(request):
+    data = QuoteMaster.objects.filter(Status =1)
+    context = {'data':data}
+    return render(request,'list_quote.html',context)
+
+@login_required(login_url='signin')
+def quoteDetails(request,id):
+    data = QuoteDetails.objects.filter(Quote_Id = id , Status =1)
+    context = {'data':data}
+    
+    return render(request,'quote_details.html',context)
+
+
+@login_required(login_url='signin')
+def estimate(request):
+
+    # for adding multiple form entry in db 
+    if request.method == "POST":
+        try:
+            # Parse JSON data
+            data = json.loads(request.body)
+            entries = data.get("entries", [])
+            # Save each entry into the database
+            for entry in entries:
+                last_bill = EstimateMaster.objects.order_by('-Estimation_Id').first()
+                if last_bill:
+                    last_id = int(last_bill.Estimation_Id[4:])  # Extract the numeric part
+                    new_id = f"ESTM{last_id + 1:04d}"
+                else:
+                    new_id = "ESTM0001"
+                detail_id = EstimateMaster.objects.create(
+                    Estimation_Id= new_id,
+                    Customer_Id=entry.get("customer_id"),
+                    Customer_Name=entry.get("customer_name"),
+                    Phone_No=entry.get("customer_phone"),
+                    Grand_Total = int(data.get("grand_total", 0)) if data.get("grand_total") not in [None, "", "None"] else 0,
+                    # Grand_Total_With_Gst = int(data.get("grand_total_with_gst", 0)) if data.get("grand_total_with_gst") not in [None, "", "None"] else 0,
+                )
+                break
+            for entry in entries:
+                EstimateDetails.objects.create(
+                    Estimation_Id = detail_id,
+                    Customer_Id=entry.get("customer_id"),
+                    Customer_Name=entry.get("customer_name"),
+                    Phone_No=entry.get("customer_phone"),
+                    Product_Name=entry.get("product", "NONE") if entry.get("product") not in [None, "", "None"] else "NONE",
+                    Custom_Product=entry.get("custom", "NONE") if entry.get("custom") not in [None, "", "None"] else "NONE",
+                    Category_Name=entry.get("category", "NONE") if entry.get("category") not in [None, "", "None"] else "NONE",
+                    Sub_Category=entry.get("sub_category", "NONE") if entry.get("sub_category") not in [None, "", "None"] else "NONE",
+                    Length=int(entry.get("length", 0)) if entry.get("length") not in [None, "", "None"] else 0,
+                    Width=int(entry.get("width", 0)) if entry.get("width") not in [None, "", "None"] else 0,
+                    Quantity=int(entry.get("quantity", 0)),  # Convert to int (default 0 if missing)
+                    Cost_Per_Quantity=float(entry.get("cost", 0)) if entry.get("cost") not in [None, "", "None"] else 0,  # Convert to float (default 0 if missing)
+                    # GST=float(entry.get("gst", 0)) if entry.get("gst") not in [None, "", "None"] else 0,  # Convert to float (default 0 if missing)
+                    # HSN_Code=entry.get("hsn", "NONE") if entry.get("hsn") not in [None, "", "None"] else "NONE",
+                    Total_Cost=float(entry.get("total", 0)),  # Convert to float
+                    # Total_Cost_With_Gst=float(entry.get("total_with_gst", 0))  # Convert to float
+                )
+            return redirect("listestimate")
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON data"}, status=400)
+        except Exception as e:
+            traceback.print_exc()  # This prints the full error traceback in the console
+            return JsonResponse({"error": str(e)}, status=500)
+  
+    return redirect('bill')
+
+@login_required(login_url='signin')
+def listEstimate(request):
+    data = EstimateMaster.objects.filter(Status =1)
+    context = {'data':data}
+    return render(request,'list_estimate.html',context)
+@login_required(login_url='signin')
+def estimateDetails(request,id):
+    data = EstimateDetails.objects.filter(Estimation_Id = id , Status =1)
+    context = {'data':data}
+    
+    return render(request,'estimate_details.html',context)
+
+
+
+
+ 
+
+@login_required(login_url='signin')
+@user_passes_test(is_admin)  # Only admin can add employees
+def add_employee(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        emp_id = request.POST['emp_id']
+        name = request.POST['name']
+        phone = request.POST['phone']
+        DOJ = request.POST['DOJ']
+        blood_group = request.POST['blood_group']
+        aadhar = request.POST['aadhar']
+        pan = request.POST['pan']
+        email = request.POST['email']
+        role = request.POST['role']
+        address = request.POST['address']
+
+        # Create employee user
+        user = Employee.objects.create(
+            username=username,
+            password=make_password(password),  # Hashing the password
+            emp_id=emp_id,
+            first_name=name,  # Django default field
+            phone=phone,
+            DOJ=DOJ,
+            blood_group=blood_group,
+            aadhar=aadhar,
+            pan=pan,
+            email=email,
+            address=address,
+            role=role  # Default role as Employee
+        )
+        messages.info(request,"employee added")
+        return redirect('add-employee')  # Redirect after successful creation
+    last_emp = Employee.objects.order_by('-emp_id').first()
+    if last_emp.emp_id:
+        last_emp = int(last_emp.emp_id[3:])  # Extract the numeric part
+        new_id = f"EMP{last_emp + 1:04d}"
+    else:
+        new_id = "EMP0001"
+    context = {'data':new_id}
+
+    return render(request, 'add_employee.html', context)
+
+
+def list_employee(request):
+    return redirect("addemployee")
+
+
+def invoice(request,id):
+    data = BillingDetails.objects.filter(Bill_Id = id , Status =1)
+    data2 = BillingMaster.objects.get(Bill_Id = id , Status =1)
+    data3 = CustomerDetails.objects.get(Customer_Id = data2.Customer_Id)
+    current_date=datetime.today()
+    context = {'data':data, 'data2':data2,'data3':data3,'current_date':current_date}
+    return render(request,'invoice.html',context)
+
+
+@login_required(login_url='signin')
+def signout(request):
+    logout(request)
+    return redirect("signin")
+
+

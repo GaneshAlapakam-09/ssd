@@ -25,6 +25,22 @@ urlpatterns = [
     path('addcost/',views.addCost,name='addcost'),
     path('listcost/',views.listCost,name='listcost'),
     path('bill/',views.bill,name='bill'),
+    path('quote/',views.quote,name='quote'),
+    path('estimate/',views.estimate,name='estimate'),
+    path('listbill/',views.listBill,name='listbill'),
+    path('listquote/',views.listQuote,name='listquote'),
+    path('listestimate/',views.listEstimate,name='listestimate'),
+    path('billdetails/<str:id>',views.billDetails,name='billdetails'),
+    path('quotedetails/<str:id>',views.quoteDetails,name='quotedetails'),
+    path('estimatedetails/<str:id>',views.estimateDetails,name='estimatedetails'),
+    path('addemployee/', views.add_employee, name='addemployee'),
+    path('listemployee/', views.list_employee, name='listemployee'),
+    path('signin/', views.signin, name='signin'),
+    path('signout/', views.signout, name='signout'),
+    path('invoice/<str:id>', views.invoice, name='invoice'),
+
+
+
 
 ]
 

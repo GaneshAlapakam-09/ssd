@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser, Group, Permission
 
 # Create your models here.
 
@@ -96,8 +97,22 @@ class BillingMaster(models.Model):
     Bill_Id = models.CharField(primary_key = True , max_length=50)
     Customer_Id = models.CharField(max_length=50)
     Customer_Name =models.CharField(max_length=50)
-    Phone_No = models.IntegerField()
+    Phone_No = models.BigIntegerField()
+    Grand_Total = models.IntegerField()
+    Grand_Total_With_Gst = models.IntegerField()
+    Status = models.IntegerField(default=1)
+
+
+    def __str__(self):
+        return self.Bill_Id
+
+class BillingDetails(models.Model):
+    Bill_Id = models.ForeignKey("ssdapp.BillingMaster", on_delete=models.CASCADE)
+    Customer_Id = models.CharField(max_length=50)
+    Customer_Name =models.CharField(max_length=50)
+    Phone_No = models.BigIntegerField()
     Product_Name = models.CharField(max_length=50)
+    Custom_Product = models.CharField(max_length=50)
     Category_Name = models.CharField( max_length=50)
     Sub_Category = models.CharField(null=True, max_length=50)
     Length = models.IntegerField(default=0)
@@ -108,12 +123,101 @@ class BillingMaster(models.Model):
     HSN_Code = models.CharField(max_length=50)
     Total_Cost = models.CharField(max_length=50)
     Total_Cost_With_Gst = models.CharField(max_length=50)
+    Status = models.IntegerField(default=1)
 
     def __str__(self):
         return self.Bill_Id
     
 
 
+class QuoteMaster(models.Model):
+    Quote_Id = models.CharField(primary_key = True , max_length=50)
+    Customer_Id = models.CharField(max_length=50)
+    Customer_Name =models.CharField(max_length=50)
+    Phone_No = models.BigIntegerField()
+    Grand_Total = models.IntegerField()
+    Grand_Total_With_Gst = models.IntegerField()
+    Status = models.IntegerField(default=1)
+
+
+    def __str__(self):
+        return self.Quote_Id
+    
+
+class QuoteDetails(models.Model):
+    Quote_Id = models.ForeignKey("ssdapp.QuoteMaster", on_delete=models.CASCADE)
+    Customer_Id = models.CharField(max_length=50)
+    Customer_Name =models.CharField(max_length=50)
+    Phone_No = models.BigIntegerField()
+    Product_Name = models.CharField(max_length=50)
+    Custom_Product = models.CharField(max_length=50)
+    Category_Name = models.CharField( max_length=50)
+    Sub_Category = models.CharField(null=True, max_length=50)
+    Length = models.IntegerField(default=0)
+    Width = models.IntegerField(default=0)
+    Quantity = models.IntegerField(default=0)
+    Cost_Per_Quantity = models.IntegerField(default=0)
+    GST = models.CharField(max_length=50)
+    HSN_Code = models.CharField(max_length=50)
+    Total_Cost = models.CharField(max_length=50)
+    Total_Cost_With_Gst = models.CharField(max_length=50)
+    Status = models.IntegerField(default=1)
+
+
+    def __str__(self):
+        return self.Quote_Id
     
 
 
+class EstimateMaster(models.Model):
+    Estimation_Id = models.CharField(primary_key = True , max_length=50)
+    Customer_Id = models.CharField(max_length=50)
+    Customer_Name =models.CharField(max_length=50)
+    Phone_No = models.BigIntegerField()
+    Grand_Total = models.IntegerField()
+    Status = models.IntegerField(default=1)
+
+
+    def __str__(self):
+        return self.Estimation_Id
+    
+
+class EstimateDetails(models.Model):
+    Estimation_Id = models.ForeignKey("ssdapp.EstimateMaster", on_delete=models.CASCADE)
+    Customer_Id = models.CharField(max_length=50)
+    Customer_Name =models.CharField(max_length=50)
+    Phone_No = models.BigIntegerField()
+    Product_Name = models.CharField(max_length=50)
+    Custom_Product = models.CharField(max_length=50)
+    Category_Name = models.CharField( max_length=50)
+    Sub_Category = models.CharField(null=True, max_length=50)
+    Length = models.IntegerField(default=0)
+    Width = models.IntegerField(default=0)
+    Quantity = models.IntegerField(default=0)
+    Cost_Per_Quantity = models.IntegerField(default=0)
+    Total_Cost = models.CharField(max_length=50)
+    Status = models.IntegerField(default=1)
+
+
+    def __str__(self):
+        return self.Estimation_Id
+    
+
+
+class Employee(AbstractUser):
+    ROLE_CHOICES = [
+        ('admin', 'Admin'),
+        ('employee', 'Employee'),
+    ]
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='employee')
+    emp_id = models.CharField(max_length=20, unique=True)
+    phone = models.IntegerField(unique=True)
+    DOJ = models.DateField(null=True)
+    blood_group = models.CharField(max_length=5)
+    aadhar = models.CharField(max_length=20, unique=True)
+    pan = models.CharField(max_length=10, unique=True)
+    address = models.CharField(max_length=50 , null=True)
+
+    # Add related_name to avoid conflicts with auth.User
+    groups = models.ManyToManyField(Group, related_name="employee_groups", blank=True)
+    user_permissions = models.ManyToManyField(Permission, related_name="employee_permissions", blank=True)
