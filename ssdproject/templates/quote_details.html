@@ -94,7 +94,7 @@
 				<!-- navigation -->
 				<ul class="list-unstyled clearfix nav-list mb15">
 					<li class="active">
-						<a>
+						<a href="{% url "dashboard" %}">
 							<i class="ion ion-monitor"></i>
 							<span class="text">Dashboard</span>
 						</a>
@@ -116,6 +116,7 @@
 							<li><a href="{% url "listcustomer" %}">List Customer</a></li>
 						</ul>
 					</li>
+					{% if user.role == 'admin' %}
 					<li>
 						<a href="javascript:;">
 							<i class="icon ion-md-contact"></i>
@@ -182,6 +183,7 @@
 							<li><a href="{% url "listcost" %}">List Cost</a></li>
 						</ul>
 					</li>
+					{% endif %}
 					<li>
 						<a href="javascript:;">
 							<i class="icon ion-md-paper"></i>
@@ -350,6 +352,11 @@
 										</table>
 										<!-- #end data table -->
 			
+		</div>
+		<div class="generate-inv">
+			<p><strong>Grand Total:</strong> <span id="grandTotal">{{data2.Grand_Total}}</span></p>
+			<p><strong>Grand Total with GST:</strong> <span id="grandTotalGST">{{data2.Grand_Total_With_Gst}}</span></p>
+			<button class="btn btn-primary mr5" type="submit" id="submitButton"  onclick="window.location.href='{% url "invoice" data2.Quote_Id %}';">Generate Invoice</button>
 		</div>
 		</div>
 

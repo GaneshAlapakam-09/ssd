@@ -94,7 +94,7 @@
 				<!-- navigation -->
 				<ul class="list-unstyled clearfix nav-list mb15">
 					<li class="active">
-						<a>
+						<a href="{% url "dashboard" %}">
 							<i class="ion ion-monitor"></i>
 							<span class="text">Dashboard</span>
 						</a>
@@ -273,13 +273,13 @@
 														</div>
 													</th>
 													
-													<th>
+													{% comment %} <th>
 														Action
 														<div class="th">
 															<i class="fa fa-caret-up icon-up"></i>
 															<i class="fa fa-caret-down icon-down"></i>
 														</div>
-													</th>
+													</th> {% endcomment %}
 												</tr>
 											</thead>
 											<tbody>
@@ -413,11 +413,11 @@
 					Sub_Category: "{{ item.Sub_Category|escapejs }}", 
 					Cost_Per_Unit: "{{ item.Cost_Per_Unit|escapejs }}", 
 					Cost_Per_Sqft: "{{ item.Cost_Per_Sqft|escapejs }}", 
-					action: `<div class="btn-group list-cust">
-								<a href=""><button type="button" class="btn btn-default ion icon ion-md-create"></button></a>
-								<a href=""><button type="button" class="btn btn-default ion icon ion-md-list"></button></a>
-								<a class="del-btn" href=""><button type="button" class="btn btn-default ion icon ion-md-trash waves-effect"></button></a>
-							</div>`
+					//action: `<div class="btn-group list-cust">
+					//			<a href=""><button type="button" class="btn btn-default ion icon ion-md-create"></button></a>
+					//			<a href=""><button type="button" class="btn btn-default ion icon ion-md-list"></button></a>
+					//			<a class="del-btn" href=""><button type="button" class="btn btn-default ion icon ion-md-trash waves-effect"></button></a>
+					//		</div>`
 				}{% if not loop.last %},{% endif %}
 				{% endfor %}
 			];
@@ -431,7 +431,7 @@
 					{ data: "Sub_Category" },
 					{ data: "Cost_Per_Unit" },
 					{ data: "Cost_Per_Sqft" },
-					{ data: "action" }
+					//{ data: "action" }
 				],
 				searching: true,
 				dom: "rtip",

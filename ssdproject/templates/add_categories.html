@@ -131,7 +131,7 @@
 				<!-- navigation -->
 				<ul class="list-unstyled clearfix nav-list mb15">
 					<li class="active">
-						<a>
+						<a href="{% url "dashboard" %}">
 							<i class="ion ion-monitor"></i>
 							<span class="text">Dashboard</span>
 						</a>
@@ -295,6 +295,15 @@
 								<div class="col-md-9">
 									<input type="text" class="form-control" placeholder="Sub-Category" name="sub_category" required >
 									<span class="alert-danger">add "None" if no Sub-category</span>
+								</div>
+							</div>							
+							
+							<!-- Size -->
+							<div class="form-group">
+								<label class="col-md-3 control-label">Size</label>
+								<div class="col-md-9">
+									<input type="text" class="form-control" placeholder="Size" name="size" required >
+									<!-- <span class="alert-danger">add "None" if no Sub-category</span> -->
 								</div>
 							</div>							
 							

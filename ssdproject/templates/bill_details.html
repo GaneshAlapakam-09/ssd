@@ -101,7 +101,7 @@
 				<!-- navigation -->
 				<ul class="list-unstyled clearfix nav-list mb15">
 					<li class="active">
-						<a>
+						<a href="{% url "dashboard" %}">
 							<i class="ion ion-monitor"></i>
 							<span class="text">Dashboard</span>
 						</a>
@@ -123,6 +123,7 @@
 							<li><a href="{% url "listcustomer" %}">List Customer</a></li>
 						</ul>
 					</li>
+					{% if user.role == 'admin' %}
 					<li>
 						<a href="javascript:;">
 							<i class="icon ion-md-contact"></i>
@@ -189,6 +190,7 @@
 							<li><a href="{% url "listcost" %}">List Cost</a></li>
 						</ul>
 					</li>
+					{% endif %}
 					<li>
 						<a href="javascript:;">
 							<i class="icon ion-md-paper"></i>
@@ -239,13 +241,13 @@
 											<thead>
 												<tr>
 													<th>
-														 Bill ID
+														 Item ID
 														<div class="th">
 															<i class="fa fa-caret-up icon-up"></i>
 															<i class="fa fa-caret-down icon-down"></i>
 														</div>
 													</th>
-													<th>
+													<!-- <th>
 													 Customer Id
 														<div class="th">
 															<i class="fa fa-caret-up icon-up"></i>
@@ -265,7 +267,7 @@
 															<i class="fa fa-caret-up icon-up"></i>
 															<i class="fa fa-caret-down icon-down"></i>
 														</div>
-													</th>
+													</th> -->
 													<th>
 														Product Name
 														<div class="th">
@@ -273,13 +275,13 @@
 															<i class="fa fa-caret-down icon-down"></i>
 														</div>
 													</th>
-													<th>
+													<!-- <th>
 														Custom Product
 														<div class="th">
 															<i class="fa fa-caret-up icon-up"></i>
 															<i class="fa fa-caret-down icon-down"></i>
 														</div>
-													</th>
+													</th> -->
 													<th>
 														Category Name
 														<div class="th">
@@ -294,7 +296,7 @@
 															<i class="fa fa-caret-down icon-down"></i>
 														</div>
 													</th>
-													<th>
+													<!--<th>
 														Length 
 														<div class="th">
 															<i class="fa fa-caret-up icon-up"></i>
@@ -303,6 +305,13 @@
 													</th>
 													<th>
 														Width 
+														<div class="th">
+															<i class="fa fa-caret-up icon-up"></i>
+															<i class="fa fa-caret-down icon-down"></i>
+														</div>
+													</th>-->
+													<th>
+														Size
 														<div class="th">
 															<i class="fa fa-caret-up icon-up"></i>
 															<i class="fa fa-caret-down icon-down"></i>
@@ -322,7 +331,7 @@
 															<i class="fa fa-caret-down icon-down"></i>
 														</div>
 													</th>
-													<th>
+													<!--<th>
 														GST 
 														<div class="th">
 															<i class="fa fa-caret-up icon-up"></i>
@@ -335,7 +344,7 @@
 															<i class="fa fa-caret-up icon-up"></i>
 															<i class="fa fa-caret-down icon-down"></i>
 														</div>
-													</th>
+													</th>-->
 													<th>
 														Total 
 														<div class="th">
@@ -343,13 +352,13 @@
 															<i class="fa fa-caret-down icon-down"></i>
 														</div>
 													</th>
-													<th>
+													<!--<th>
 														Total With GST 
 														<div class="th">
 															<i class="fa fa-caret-up icon-up"></i>
 															<i class="fa fa-caret-down icon-down"></i>
 														</div>
-													</th>
+													</th>-->
 												</tr>
 											</thead>
 											<tbody>
@@ -361,7 +370,6 @@
 		</div>
 		<div class="generate-inv">
 			<p><strong>Grand Total:</strong> <span id="grandTotal">{{data2.Grand_Total}}</span></p>
-			<p><strong>Grand Total with GST:</strong> <span id="grandTotalGST">{{data2.Grand_Total_With_Gst}}</span></p>
 			<button class="btn btn-primary mr5" type="submit" id="submitButton"  onclick="window.location.href='{% url "invoice" data2.Bill_Id %}';">Generate Invoice</button>
 		</div>
 		</div>
@@ -482,22 +490,23 @@
 			var datas = [
 				{% for item in data %}
 				{ 
-					Bill_Id: "{{ item.Bill_Id|escapejs }}", 
-					Customer_Id: "{{ item.Customer_Id|escapejs }}", 
-					Customer_Name: "{{ item.Customer_Name|escapejs }}",  
-					Phone_No: "{{ item.Phone_No|escapejs }}", 
+					Item_Id: "{{ item.Item_Id|escapejs }}", 
+					//Customer_Id: "{{ item.Customer_Id|escapejs }}", 
+					//Customer_Name: "{{ item.Customer_Name|escapejs }}",  
+					//Phone_No: "{{ item.Phone_No|escapejs }}",
 					Product_Name: "{{ item.Product_Name|escapejs }}", 
-					Custom_Product: "{{ item.Custom_Product|escapejs }}", 
+					//Custom_Product: "{{ item.Custom_Product|escapejs }}",
 					Category_Name: "{{ item.Category_Name|escapejs }}", 
 					Sub_Category: "{{ item.Sub_Category|escapejs }}", 
-					Length: "{{ item.Length|escapejs }}", 
-					Width: "{{ item.Width|escapejs }}", 
+					//Length: "{{ item.Length|escapejs }}", 
+					//Width: "{{ item.Width|escapejs }}", 
+					Size: "{{ item.Size|escapejs }}", 
 					Quantity: "{{ item.Quantity|escapejs }}", 
-					Cost_Per_Quantity: "{{ item.Cost_Per_Quantity|escapejs }}",
-					GST: "{{ item.GST|escapejs }}", 
-					HSN_Code: "{{ item.HSN_Code|escapejs }}", 
+					Cost_Per_Quantity: "{% if item.Modified_Cost == 0 %}{{ item.Cost_Per_Quantity|escapejs }}{% else %}{{ item.Modified_Cost|escapejs }}{% endif %}",
+					//GST: "{{ item.GST|escapejs }}", 
+					//HSN_Code: "{{ item.HSN_Code|escapejs }}", 
 					Total_Cost: "{{ item.Total_Cost|escapejs }}", 
-					Total_Cost_With_Gst: "{{ item.Total_Cost_With_Gst|escapejs }}"
+					//Total_Cost_With_Gst: "{{ item.Total_Cost_With_Gst|escapejs }}"
 				}{% if not loop.last %},{% endif %}
 				{% endfor %}
 			];
@@ -505,22 +514,23 @@
 			var table = $table.DataTable({
 				data: datas,
 				columns: [
-					{ data: "Bill_Id" },
-					{ data: "Customer_Id" },
-					{ data: "Customer_Name" },
-					{ data: "Phone_No" },
+					{ data: "Item_Id" },
+					//{ data: "Customer_Id" },
+					//{ data: "Customer_Name" },
+					//{ data: "Phone_No" },
 					{ data: "Product_Name" },
-					{ data: "Custom_Product" },
+					//{ data: "Custom_Product" },
 					{ data: "Category_Name" },
 					{ data: "Sub_Category" },
-					{ data: "Length" },
-					{ data: "Width" },
+					{ data: "Size" },
+					//{ data: "Length" },
+					//{ data: "Width" },
 					{ data: "Quantity" },
 					{ data: "Cost_Per_Quantity" },
-					{ data: "GST" },
-					{ data: "HSN_Code" },
+					//{ data: "GST" },
+					//{ data: "HSN_Code" },
 					{ data: "Total_Cost" },
-					{ data: "Total_Cost_With_Gst" }
+					//{ data: "Total_Cost_With_Gst" }
 				],
 				searching: true,
 				dom: "rtip",

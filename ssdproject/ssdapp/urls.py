@@ -38,6 +38,11 @@ urlpatterns = [
     path('signin/', views.signin, name='signin'),
     path('signout/', views.signout, name='signout'),
     path('invoice/<str:id>', views.invoice, name='invoice'),
+    path('', views.dashboard, name='dashboard'),
+    path('addpayment/<str:id>', views.add_payment, name='addpayment'),
+    path('listpayment/<str:id>', views.list_payment, name='listpayment'),
+    path('bill_and_pay/<str:id>', views.bill_and_pay, name='bill_and_pay'),
+
 
 
 

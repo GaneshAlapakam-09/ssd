@@ -35,8 +35,21 @@
 <link href="https://unpkg.com/ionicons@4.5.10-0/dist/css/ionicons.min.css" rel="stylesheet">
  	<link href='http://fonts.googleapis.com/css?family=Roboto:400,500,700,300' rel='stylesheet' type='text/css'>
 
+	<!-- Font Awesome CDN -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+
 	<!-- Match Media polyfill for IE9 -->
 	<!--[if IE 9]> <script src="scripts/ie/matchMedia.js"></script>  <![endif]--> 
+
+
+<style>
+	.panel-heading.addbill-heading{
+		display:flex;
+		justify-content:space-between;
+		align-items:center;
+	}
+</style>
 
 	
 </head>
@@ -94,7 +107,7 @@
 				<!-- navigation -->
 				<ul class="list-unstyled clearfix nav-list mb15">
 					<li class="active">
-						<a>
+						<a href="{% url "dashboard" %}">
 							<i class="ion ion-monitor"></i>
 							<span class="text">Dashboard</span>
 						</a>
@@ -116,6 +129,7 @@
 							<li><a href="{% url "listcustomer" %}">List Customer</a></li>
 						</ul>
 					</li>
+					{% if user.role == 'admin' %}
 					<li>
 						<a href="javascript:;">
 							<i class="icon ion-md-contact"></i>
@@ -182,6 +196,7 @@
 							<li><a href="{% url "listcost" %}">List Cost</a></li>
 						</ul>
 					</li>
+					{% endif %}
 					<li>
 						<a href="javascript:;">
 							<i class="icon ion-md-paper"></i>
@@ -209,7 +224,10 @@
 		<!-- Data Table -->
 		<div class="col-md-11">
 			<div class="panel panel-lined table-responsive panel-hovered mb20 data-table" style="padding-bottom: 20px">
-				<div class="panel-heading">Bills List</div>
+				<div class="panel-heading addbill-heading">
+					<div>Bills List</div>
+					<div><a class="btn btn-primary mr5" href="{% url "bill" %}">Add Bill</a></div>
+				</div>
 				<div class="panel-body">
 					<div class="small text-bold left mt5">
 						Show&nbsp;
@@ -265,16 +283,23 @@
 															<i class="fa fa-caret-down icon-down"></i>
 														</div>
 													</th>
-													<th>
+													<!-- <th>
 														Bill Amount With GST
 														<div class="th">
 															<i class="fa fa-caret-up icon-up"></i>
 															<i class="fa fa-caret-down icon-down"></i>
 														</div>
-													</th>
+													</th>-->
 													
 													<th>
 														Action
+														<div class="th">
+															<i class="fa fa-caret-up icon-up"></i>
+															<i class="fa fa-caret-down icon-down"></i>
+														</div>
+													</th>
+													<th>
+														Status
 														<div class="th">
 															<i class="fa fa-caret-up icon-up"></i>
 															<i class="fa fa-caret-down icon-down"></i>
@@ -412,12 +437,27 @@
 					Customer_Name: "{{ item.Customer_Name|escapejs }}", 
 					Phone_No: "{{ item.Phone_No|escapejs }}", 
 					Grand_Total: "{{ item.Grand_Total|escapejs }}", 
-					Grand_Total_With_Gst: "{{ item.Grand_Total_With_Gst|escapejs }}", 
+					//Grand_Total_With_Gst: "{{ item.Grand_Total_With_Gst|escapejs }}", 
 					action: `<div class="btn-group list-cust">
-								<a href=""><button type="button" class="btn btn-default ion icon ion-md-create"></button></a>
-								<a href="{% url "billdetails" item.Bill_Id %}"><button type="button" class="btn btn-default ion icon ion-md-list"></button></a>
-								<a class="del-btn" href=""><button type="button" class="btn btn-default ion icon ion-md-trash waves-effect"></button></a>
-							</div>`
+								<a title="Bill Details" href="{% url "billdetails" item.Bill_Id %}"><button type="button" class="btn btn-default ion icon fa fa-list-ol"></button></a>
+								<a title="List Payments" href="{% url "listpayment" item.Bill_Id %}"><button type="button" class="btn btn-default ion icon ion-md-paper"></button></a> 
+								<a title="Add Payment" href="{% url "addpayment" item.Bill_Id %}"><button type="button" class="btn btn-default ion icon ion-md-cash"></button></a> 
+								{% comment %} <a class="del-btn" href=""><button type="button" class="btn btn-default ion icon ion-md-cash waves-effect"></button></a> {% endcomment %}
+							</div>`,
+					status: `<span style="color: 
+					{% if item.Fully_Paid == 1 and item.Force_Paid == 0 %}green
+					{% elif item.Partialy_Paid == 1 %}orange
+					{% elif item.Not_Paid == 1 %}blue
+					{% elif item.Force_Paid == 1 and item.Fully_Paid == 1 %}red
+					{% else %}black{% endif %};">
+
+
+					{% if item.Fully_Paid == 1 and item.Force_Paid == 0 %}Fully Paid
+					{% elif item.Partialy_Paid == 1 %}Partially Paid
+					{% elif item.Not_Paid == 1 %}Not Paid
+					{% elif item.Force_Paid == 1 and item.Fully_Paid == 1 %}Force Paid
+					{% else %}Unknown{% endif %}
+				</span>`
 				}{% if not loop.last %},{% endif %}
 				{% endfor %}
 			];
@@ -430,12 +470,15 @@
 					{ data: "Customer_Name" },
 					{ data: "Phone_No" },
 					{ data: "Grand_Total" },
-					{ data: "Grand_Total_With_Gst" },
-					{ data: "action" }
+					//{ data: "Grand_Total_With_Gst" },
+					{ data: "action" },
+					{ data: "status" }
+
 				],
 				searching: true,
 				dom: "rtip",
-				pageLength: 10
+				pageLength: 10,
+				order: [[0, "desc"]]
 			});
 	
 			$dataTable.find(".searchInput").on("keyup", function () {

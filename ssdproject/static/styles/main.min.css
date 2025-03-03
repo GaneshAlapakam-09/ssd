@@ -1813,8 +1813,8 @@ fieldset[disabled] .btn-youtube.active {
 .table > tbody > tr > td,
 .table > tfoot > tr > td {
   vertical-align: middle;
-  padding-left: 22px;
-  padding-right: 22px;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 .table > thead > tr > th {
   border-bottom-width: 1px;

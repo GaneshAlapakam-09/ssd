@@ -28,6 +28,11 @@
 <link rel="stylesheet" href="{% static 'styles/main.min.css' %}">
 
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/fontawesome.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+
+
 <style>
 	 /* General styling */
 .dropdown {
@@ -100,11 +105,44 @@
         text-decoration : underline
     }
 	.table-responsive {
-		overflow-x: auto;
-		white-space: nowrap;
+		
 		background-color:#fff;
 		padding:10px;
 	}
+	.biling-buttons{
+		display:flex;
+		justify-content:center;
+		padding:10px;
+	}
+
+	.clearfix.add{
+		display:flex;
+		justify-content:center;
+		}
+
+	.col-md-9.cost_per_quantity{
+		padding-right:0px;
+		padding-left:5px;
+	}
+	.col-md-3.manual{
+		display:flex;
+	}
+
+	.specs{
+		font-size:10px;
+	}
+	th{
+		text-align:center;
+	}
+
+	.panel-heading.addbill-heading{
+		display:flex;
+		justify-content:space-between;
+		align-items:center;
+	}
+
+
+	
 	
 </style>
 
@@ -174,7 +212,7 @@
 				<!-- navigation -->
 				<ul class="list-unstyled clearfix nav-list mb15">
 					<li class="active">
-						<a>
+						<a href="{% url "dashboard" %}">
 							<i class="ion ion-monitor"></i>
 							<span class="text">Dashboard</span>
 						</a>
@@ -196,6 +234,7 @@
 							<li><a href="{% url "listcustomer" %}">List Customer</a></li>
 						</ul>
 					</li>
+					{% if user.role == 'admin' %}
 					<li>
 						<a href="javascript:;">
 							<i class="icon ion-md-contact"></i>
@@ -262,6 +301,7 @@
 							<li><a href="{% url "listcost" %}">List Cost</a></li>
 						</ul>
 					</li>
+					{% endif %}
 					<li>
 						<a href="javascript:;">
 							<i class="icon ion-md-paper"></i>
@@ -303,8 +343,13 @@
 
            <!-- col-left -->
 			<div class="col-sm-12 col-md-11">
+				
 				<div class="panel panel-default panel-hovered panel-stacked mb30">
-					<div class="panel-heading">Add Billing</div>
+					<div class="panel-heading addbill-heading">
+						<div>Add Billing</div>
+						<div><a class="btn btn-primary mr5" href="{% url "listbill" %}">List Bill</a></div>
+					</div>
+					
 					{% if messages %}
 
         {% for message in messages %}
@@ -315,14 +360,15 @@
         
         {% endif %}
 					<div class="panel-body">
+
 						<form id='form' class="form-horizontal" action="" method="POST">
 							{% csrf_token %}
 							 <!-- form horizontal acts as a row -->
 							<!-- Bill Id-->
 							<div class="form-group">
-								<label class="col-md-3 control-label">Bill Id</label>
+								<label class="col-md-3 control-label">Bill No</label>
 								<div class="col-md-9">
-									<input type="text" value="{{new_id}}" class="form-control" placeholder="Input is disabled" disabled>
+									<input type="text" value="{{new_id}}" class="form-control" placeholder="Input is" readonly id="billId" >
 								</div>
 							</div>
 
@@ -370,6 +416,16 @@
                                     </select> 
 								</div>
 							</div>							
+							
+							<!-- Size -->
+							<div class="form-group">
+								<label class="col-md-3 control-label">Size</label>
+								<div class="col-md-9">
+                                    <select name="size" id="size" class="dropdown" required>
+										<option value="">Select a Size</option>
+                                    </select> 
+								</div>
+							</div>							
 								
 
 							<!-- cost calculate in sqft -->
@@ -395,38 +451,49 @@
 							<div class="form-group">
 								<label class="col-md-3 control-label">Quantity</label>
 								<div class="col-md-9">
-									<input type="number" class="form-control" id="quantity" name="quantity" oninput="calculateTotal()" placeholder="Quantity">
+									<input type="number" class="form-control" id="quantity" name="quantity" placeholder="Quantity" required>
 								</div>
-							</div>		
+							</div>	
+							<div class="form-group" id="length-width-quantity" style="display:none;">
+								<div class="form-group">
+									<label class="col-md-3 control-label">Total Sqft</label>
+									<div class="col-md-9">
+										{% comment %} <input type="number" class="form-control"  placeholder="Cost in ₹" id="cost" name="cost" required> {% endcomment %}
+										<input type="number" class="form-control" id="total_sqft" name="width" readonly placeholder="Total Sqft" >
+									</div>
+								</div>	
+							</div>	
 
 							<!-- cost -->
 							<div class="form-group">
-								<label class="col-md-3 control-label">Cost per Quantity</label>
-								<div class="col-md-9">
-									<input type="number" class="form-control" id="cost" name="cost" oninput="calculateTotal()" placeholder="Cost" required readonly>
-								</div>
+								<div class="ui-radio cost-radio ui-radio-primary">
+								<label class="col-md-3 control-label">Cost Per Quantity</label>
+									<div class="col-md-9 cost_per_quantity">
+										<input type="number" class="form-control" id="cost" name="cost"  placeholder="Cost" required readonly>
+									</div>
+							    </div>
 							</div>	
+
+							
 							
 							
 							<!-- GST -->
-							<div class="form-group">
+							<!--<div class="form-group">
 								<label class="col-md-3 control-label">GST (%)</label>
 								<div class="col-md-9">
-									<select id="gst" name="gst" oninput="calculateTotal()" class="dropdown" required>
-										<option value="">Select GST (%)</option>
-                                    </select> 
+									<input type="text" class="form-control" id="gst" name="gst"  placeholder="GST (%)" required readonly>
+									
 								</div>
-							</div>		
+							</div>	-->	
 
 							<!-- HSN -->
-							<div class="form-group">
+							<!-- <div class="form-group">
 								<label class="col-md-3 control-label">HSN Code</label>
 								<div class="col-md-9">
-									<select id="hsn" name="hsn" class="dropdown" required>
-										<option value="">Select HSN Code</option>
-                                    </select> 
+									<input type="text" class="form-control" id="hsn" name="hsn"  placeholder="HSN Code" required readonly>
+									
 								</div>
-							</div>		
+							</div>	 -->	
 							
 							
 							<!-- Total -->
@@ -439,15 +506,33 @@
 							
 							
 							<!-- Total with GST -->
-							<div class="form-group">
+							<!-- <div class="form-group">
 								<label class="col-md-3 control-label">Total with GST</label>
 								<div class="col-md-9">
 									<input type="text" class="form-control" id="total_with_gst" name="total_with_gst" readonly>
 								</div>
-							</div>		
+							</div>	-->	
+							<div class="form-group">
+								<label class="col-md-3 control-label">Manual Cost</label>
+								<div class="ui-radio cost-radio ui-radio-primary col-md-1">
+                                    <label class="ui-radio-inline"> 
+										<input type="checkbox" value="Cost Per Unit" name="manual_cost" id="manualCostRadio"> 
+										<span></span>
+									</label>
+                                </div>
+								<div class="col-md-3 manual" id="manualInputs" style="display: none;">
+									<label class="col-md-3 control-label">Manual Cost</label>
+									<input type="number" id="manualCost" class="form-control col-md-9" name="manual-cost"  placeholder="Enter Amount"> 
+                                </div>
+								<div class="col-md-3 manual" id="manualInputs2" style="display: none;">
+									<label class="col-md-3 control-label">Remarks</label>
+									<input type="text" id="remarks" class="form-control" name="remarks" placeholder="Remarks">
+                                </div>
+								
+							</div>	
 							
 							
-							<div class="clearfix right">
+							<div class="clearfix add">
 								<button type="button" class="btn btn-primary mr5">Add</button>
 							</div>
 							
@@ -456,21 +541,18 @@
 				</div>
 
 				<div class="table-responsive">
-					<button class="btn btn-primary mr5" type="submit" id="submitButton">Submit</button>
-					<button class="btn btn-primary mr5" type="submit" id="estimate">Estimate</button>
-					<button class="btn btn-primary mr5" type="submit" id="quote">Quote</button>
 						<!-- Data Table -->
 						<table class="table table-bordered table-striped table-responsive" id="entriesTable">
 							<thead>
 								<tr>
-									<th>
-										Bill Id
+									 <th>
+										S.No
 										<div class="th">
 											<i class="fa fa-caret-up icon-up"></i>
 											<i class="fa fa-caret-down icon-down"></i>
 										</div>
 									</th>
-									<th>
+									<!--<th>
 										Customer Id
 										<div class="th">
 											<i class="fa fa-caret-up icon-up"></i>
@@ -490,72 +572,70 @@
 											<i class="fa fa-caret-up icon-up"></i>
 											<i class="fa fa-caret-down icon-down"></i>
 										</div>
-									</th>
+									</th> -->
 									<th>
-										Product Name
+										Specifications
 										<div class="th">
 											<i class="fa fa-caret-up icon-up"></i>
 											<i class="fa fa-caret-down icon-down"></i>
 										</div>
 									</th>
-									<th>
+									<!--<th>
 										Custom Product 
 										<div class="th">
 											<i class="fa fa-caret-up icon-up"></i>
 											<i class="fa fa-caret-down icon-down"></i>
 										</div>
-									</th>
+									</th>-->
+									
 									<th>
-										Category Name
+										Dimension
 										<div class="th">
 											<i class="fa fa-caret-up icon-up"></i>
 											<i class="fa fa-caret-down icon-down"></i>
 										</div>
 									</th>
-									<th>
-										Sub-Category
-										<div class="th">
-											<i class="fa fa-caret-up icon-up"></i>
-											<i class="fa fa-caret-down icon-down"></i>
-										</div>
-									</th>
-									<th>
-										Length (ft)
-										<div class="th">
-											<i class="fa fa-caret-up icon-up"></i>
-											<i class="fa fa-caret-down icon-down"></i>
-										</div>
-									</th>
-									<th>
+									<!--<th>
 										Width (ft)
 										<div class="th">
 											<i class="fa fa-caret-up icon-up"></i>
 											<i class="fa fa-caret-down icon-down"></i>
 										</div>
-									</th>
+									</th>-->
 									<th>
-										Quantity
+										Qty
 										<div class="th">
 											<i class="fa fa-caret-up icon-up"></i>
 											<i class="fa fa-caret-down icon-down"></i>
 										</div>
 									</th>
 									<th>
-										gst
+										Size
+										<div class="th">
+											<i class="fa fa-caret-up icon-up"></i>
+											<i class="fa fa-caret-down icon-down"></i>
+										</div>
+									</th>
+									
+									<!-- <th>
+										GST
 										<div class="th">
 											<i class="fa fa-caret-up icon-up"></i>
 											<i class="fa fa-caret-down icon-down"></i>
 										</div>
 									</th>
 									<th>
-										hsn
+										HSN
 										<div class="th">
 											<i class="fa fa-caret-up icon-up"></i>
 											<i class="fa fa-caret-down icon-down"></i>
 										</div>
-									</th>
-									<th>
-										Cost per Quantity
+									</th> --> 
+									
+									<th style="word-wrap: break-word; 
+									white-space: normal;
+									max-width: 100px;">
+										Actual Cost / Manual Cost
 										<div class="th">
 											<i class="fa fa-caret-up icon-up"></i>
 											<i class="fa fa-caret-down icon-down"></i>
@@ -568,8 +648,15 @@
 											<i class="fa fa-caret-down icon-down"></i>
 										</div>
 									</th>
-									<th>
+									<!-- <th>
 										Total with GST
+										<div class="th">
+											<i class="fa fa-caret-up icon-up"></i>
+											<i class="fa fa-caret-down icon-down"></i>
+										</div>
+									</th> -->
+									<th>
+										Remarks
 										<div class="th">
 											<i class="fa fa-caret-up icon-up"></i>
 											<i class="fa fa-caret-down icon-down"></i>
@@ -591,8 +678,14 @@
 						<!-- #End Data Table -->
 
 						<p><strong>Grand Total:</strong> <span id="grandTotal">0.00</span></p>
-						<p><strong>Grand Total with GST:</strong> <span id="grandTotalGST">0.00</span></p>
+						{% comment %} <p><strong>Grand Total with GST:</strong> <span id="grandTotalGST">0.00</span></p> {% endcomment %}
 
+				</div>
+				<div class="biling-buttons">
+					<button class="btn btn-primary mr5" type="submit" id="submitButton">Bill</button>
+					<button class="btn btn-primary mr5" type="submit" id="estimate">Estimate</button>
+					<button class="btn btn-primary mr5" type="submit" id="quote">Quote</button>
+					<a class="btn btn-primary mr5" id="billAndPay" href="{% url "addpayment" new_id %}">Bill and Pay</a>
 				</div>
 			</div> <!-- #end col-left -->
 
@@ -780,7 +873,9 @@
         {
             product_name: "{{ item.Product_Name|escapejs }}",
             category_name: "{{ item.Categories_Name|escapejs }}",
-            sub_category: "{{ item.Sub_Categories|escapejs }}"
+            sub_category: "{{ item.Sub_Categories|escapejs }}",
+            size: "{{ item.Size|escapejs }}"
+			
         }{% if not forloop.last %},{% endif %}
         {% endfor %}
     ];
@@ -794,7 +889,10 @@
             cost_per_sqft_status: {{ item.Cost_Per_Sqft_Status }},
             cost_per_sqft: {{ item.Cost_Per_Sqft }},
             cost_per_unit_status: {{ item.Cost_Per_Unit_Status }},
-            cost_per_unit: {{ item.Cost_Per_Unit }}
+            cost_per_unit: {{ item.Cost_Per_Unit }},
+            fixed_cost_status: {{ item.Fixed_Cost_Status }},
+            fixed_cost: {{ item.Fixed_Cost }},
+            size: "{{ item.Size }}"
         }{% if not forloop.last %},{% endif %}
         {% endfor %}
     ];
@@ -803,26 +901,35 @@
         const productDropdown = document.getElementById("product");
         const categoryDropdown = document.getElementById("category");
         const subCategoryDropdown = document.getElementById("subcategory");
-        const gstDropdown = document.getElementById("gst");
-        const hsnDropdown = document.getElementById("hsn");
+        const sizeDropdown = document.getElementById("size");
+        //const gstDropdown = document.getElementById("gst");
+        //const gstInput = document.getElementById("gst");
+        //const hsnDropdown = document.getElementById("hsn");
+        //const hsnInput = document.getElementById("hsn");
         const costField = document.getElementById("cost");
+        
+
         const lengthField = document.getElementById("length");
         const widthField = document.getElementById("width");
         const quantityField = document.getElementById("quantity");
         const totalField = document.getElementById("total");
-        const totalWithGstField = document.getElementById("total_with_gst");
+        //const totalWithGstField = document.getElementById("total_with_gst");
         const lengthWidthInput = document.getElementById("length-width-input");
+        const lengthWidthQuantity = document.getElementById("length-width-quantity");
+        const totalSqft = document.getElementById("total_sqft");
+
 
         function updateGSTAndCategory() {
             const selectedProduct = productDropdown.value;
             
             // Reset dropdowns and fields
-            gstDropdown.innerHTML = `<option value="">Select GST (%)</option>`;
-            hsnDropdown.innerHTML = `<option value="">Select HSN Code</option>`;
+            //gstDropdown.innerHTML = `<option value="">Select GST (%)</option>`;
+            //hsnDropdown.innerHTML = `<option value="">Select HSN Code</option>`;
             categoryDropdown.innerHTML = `<option value="">Select a category</option>`;
             subCategoryDropdown.innerHTML = `<option value="">Select a Sub-category</option>`;
-            costField.value = totalField.value = totalWithGstField.value = "";
+            //costField.value = totalField.value = totalWithGstField.value = "";
             lengthWidthInput.style.display = "none";
+            lengthWidthQuantity.style.display = "none";
             lengthField.removeAttribute("required");
             widthField.removeAttribute("required");
 
@@ -835,6 +942,8 @@
             }
         }
 
+		
+
         function handleCustomProduct() {
             categoryDropdown.setAttribute("disabled", "true");
             subCategoryDropdown.setAttribute("disabled", "true");
@@ -844,10 +953,16 @@
             costField.removeAttribute("readonly");
             costField.setAttribute("required", "true");
 
-            gstDropdown.parentElement.style.display = "none";
-            gstDropdown.removeAttribute("required");
-            hsnDropdown.parentElement.style.display = "none";
-            hsnDropdown.removeAttribute("required");
+            //gstDropdown.parentElement.style.display = "none";
+            //gstDropdown.removeAttribute("required");
+			//gstInput.parentElement.style.display = "none";
+            //gstInput.removeAttribute("required");
+			
+            //hsnDropdown.parentElement.style.display = "none";
+            //hsnDropdown.removeAttribute("required");
+
+            //hsnInput.parentElement.style.display = "none";
+            //hsnInput.removeAttribute("required");
 
             let existingTextarea = document.getElementById("custom-product-description");
             if (!existingTextarea) {
@@ -866,7 +981,7 @@
                 const total = cost * quantity;
 
                 totalField.value = total.toFixed(2);
-                totalWithGstField.value = total.toFixed(2);
+                //totalWithGstField.value = total.toFixed(2);
             }
 
             costField.addEventListener("input", updateCustomTotal);
@@ -883,10 +998,17 @@
             costField.setAttribute("readonly", "true");
             costField.removeAttribute("required");
 
-            gstDropdown.parentElement.style.display = "block";
-            hsnDropdown.parentElement.style.display = "block";
-            gstDropdown.setAttribute("required", "true");
-            hsnDropdown.setAttribute("required", "true");
+            //gstDropdown.parentElement.style.display = "block";
+            //gstDropdown.setAttribute("required", "true");
+
+            //gstInput.parentElement.style.display = "block";
+            //gstInput.setAttribute("required", "true");
+
+            //hsnDropdown.parentElement.style.display = "block";
+            //hsnDropdown.setAttribute("required", "true");
+
+            //hsnInput.parentElement.style.display = "block";
+            //hsnInput.setAttribute("required", "true");
 
             let existingTextarea = document.getElementById("custom-product-description");
             if (existingTextarea) {
@@ -897,93 +1019,172 @@
         function populateGSTAndHSN(product) {
             const productInfo = productsData.find(p => p.product_name === product);
             if (productInfo) {
-                gstDropdown.innerHTML += `<option value="${productInfo.GST}">${productInfo.GST}%</option>`;
-                hsnDropdown.innerHTML += `<option value="${productInfo.HSN}">${productInfo.HSN}</option>`;
+                //gstDropdown.innerHTML += `<option value="${productInfo.GST}">${productInfo.GST}%</option>`;
+				//gstInput.value = productInfo.GST;
+                //hsnDropdown.innerHTML += `<option value="${productInfo.HSN}">${productInfo.HSN}</option>`;
+				//hsnInput.value = productInfo.HSN;
             }
         }
 
-        function populateCategoryDropdown(product) {
-            const productCategories = categoryData.filter(c => c.product_name === product);
-            productCategories.forEach(cat => {
-                categoryDropdown.innerHTML += `<option value="${cat.category_name}">${cat.category_name}</option>`;
-            });
-        }
+		function populateCategoryDropdown(product) {
+			const productCategories = categoryData.filter(c => c.product_name === product);
+			
+			productCategories.forEach(cat => {
+				if (![...categoryDropdown.options].some(option => option.value === cat.category_name)) {
+					const option = document.createElement("option");
+					option.value = cat.category_name;
+					option.textContent = cat.category_name;
+					categoryDropdown.appendChild(option);
+				}
+			});
+		}
+		
 
-        function updateSubCategory() {
-            const selectedProduct = productDropdown.value;
-            const selectedCategory = categoryDropdown.value;
-            subCategoryDropdown.innerHTML = `<option value="">Select a Sub-category</option>`;
-
-            const subCategories = categoryData.filter(c => c.product_name === selectedProduct && c.category_name === selectedCategory);
-            subCategories.forEach(sub => {
-                subCategoryDropdown.innerHTML += `<option value="${sub.sub_category}">${sub.sub_category}</option>`;
-            });
-
-            costField.value = "";
-            totalField.value = "";
-            totalWithGstField.value = "";
-            lengthWidthInput.style.display = "none";
-            lengthField.removeAttribute("required");
-            widthField.removeAttribute("required");
-        }
+		function updateSubCategory() {
+			const selectedProduct = productDropdown.value;
+			const selectedCategory = categoryDropdown.value;
+			subCategoryDropdown.innerHTML = `<option value="">Select a Sub-category</option>`;
+		
+			const subCategories = categoryData.filter(c => c.product_name === selectedProduct && c.category_name === selectedCategory);
+			
+			subCategories.forEach(sub => {
+				if (![...subCategoryDropdown.options].some(option => option.value === sub.sub_category)) {
+					const option = document.createElement("option");
+					option.value = sub.sub_category;
+					option.textContent = sub.sub_category;
+					subCategoryDropdown.appendChild(option);
+				}
+			});
+		
+			// Reset size dropdown
+			sizeDropdown.innerHTML = `<option value="">Select a Size</option>`;
+			costField.value = "";
+			totalField.value = "";
+			lengthWidthInput.style.display = "none";
+			lengthWidthQuantity.style.display = "none";
+			lengthField.removeAttribute("required");
+			widthField.removeAttribute("required");
+		}
+		
+		function updateSize() {
+			const selectedProduct = productDropdown.value;
+			const selectedCategory = categoryDropdown.value;
+			const selectedSubCategory = subCategoryDropdown.value;
+		
+			sizeDropdown.innerHTML = `<option value="">Select a Size</option>`;
+		
+			const availableSizes = categoryData.filter(s =>
+				s.product_name === selectedProduct &&
+				s.category_name === selectedCategory &&
+				s.sub_category === selectedSubCategory
+			);
+		
+			availableSizes.forEach(size => {
+				sizeDropdown.innerHTML += `<option value="${size.size}">${size.size}</option>`;
+			});
+		
+			costField.value = "";
+			totalField.value = "";
+		
+			// Call updateCost() when size is selected
+			sizeDropdown.addEventListener("change", updateCost);
+		}
+		
+		
+		
 
         function updateCost() {
-            const selectedProduct = productDropdown.value;
-            const selectedCategory = categoryDropdown.value;
-            const selectedSubCategory = subCategoryDropdown.value;
-
-            const costInfo = costData.find(c =>
-                c.product_name === selectedProduct &&
-                c.category_name === selectedCategory &&
-                c.sub_category === selectedSubCategory
-            );
-
-            if (costInfo) {
-                if (costInfo.cost_per_sqft_status === 1) {
-                    lengthWidthInput.style.display = "block";
-                    lengthField.setAttribute("required", "true");
-                    widthField.setAttribute("required", "true");
-                    costField.value = costInfo.cost_per_sqft;
-                } else {
-                    lengthWidthInput.style.display = "none";
-                    costField.value = costInfo.cost_per_unit;
-                    lengthField.removeAttribute("required");
-                    widthField.removeAttribute("required");
-                }
-            } else {
-                alert("This product does not have costing.");
-                lengthWidthInput.style.display = "none";
-                lengthField.removeAttribute("required");
-                widthField.removeAttribute("required");
-                costField.value = 0;
-            }
-
-            calculateTotal();
-        }
+			const selectedProduct = productDropdown.value;
+			const selectedCategory = categoryDropdown.value;
+			const selectedSubCategory = subCategoryDropdown.value;
+			const selectedSize = sizeDropdown.value;
+		
+			const costInfo = costData.find(c =>
+				c.product_name === selectedProduct &&
+				c.category_name === selectedCategory &&
+				c.sub_category === selectedSubCategory &&
+				c.size === selectedSize
+			);
+			console.log("===========",selectedProduct);
+			console.log("===========",selectedCategory);
+			console.log("===========",selectedSubCategory);
+			console.log("===========",selectedSize);
+		
+			if (costInfo) {
+				if (costInfo.cost_per_sqft_status === 1) {
+					lengthWidthInput.style.display = "block";
+					lengthWidthQuantity.style.display = "block";
+					lengthField.setAttribute("required", "true");
+					widthField.setAttribute("required", "true");
+					costField.value = costInfo.cost_per_sqft;
+				}
+				else if (costInfo.fixed_cost_status === 1) { 
+					lengthWidthInput.style.display = "none";
+					lengthWidthQuantity.style.display = "none";
+					costField.value = costInfo.fixed_cost;
+					lengthField.removeAttribute("required");
+					widthField.removeAttribute("required");
+				}
+				else {
+					lengthWidthInput.style.display = "none";
+					lengthWidthQuantity.style.display = "none";
+					costField.value = costInfo.cost_per_unit;
+					lengthField.removeAttribute("required");
+					widthField.removeAttribute("required");
+				}
+			} else {
+				alert("This product does not have costing.");
+				lengthWidthInput.style.display = "none";
+				lengthWidthQuantity.style.display = "none";
+				lengthField.removeAttribute("required");
+				widthField.removeAttribute("required");
+				costField.value = 0;
+			}
+		
+			calculateTotal();
+		}
+		
 
         function calculateTotal() {
             const quantity = parseFloat(quantityField.value) || 0;
             const cost = parseFloat(costField.value) || 0;
-            const gst = parseFloat(gstDropdown.value) || 0;
-            let total = cost * quantity;
+			const manualCostField = document.getElementById("manualCost");
+            const manualCost = parseFloat(manualCostField.value) || 0;
+
+			let total = 0;
+            //const gst = parseFloat(gstInput.value) || 0;
+            //const gst = parseFloat(gstDropdown.value) || 0;
+			if (manualCost == 0){
+				total = cost * quantity;
+			}
+			else{
+				total = quantity * manualCost;
+			}
 
             if (lengthWidthInput.style.display === "block") {
                 const length = parseFloat(lengthField.value) || 0;
                 const width = parseFloat(widthField.value) || 0;
-                total = length * width * cost * quantity;
+                total = length * width * quantity * cost;
+				totalSqft.value = length * width  * quantity;
             }
 
             totalField.value = total.toFixed(2);
-            totalWithGstField.value = (total * (1 + gst / 100)).toFixed(2);
+            //totalWithGstField.value = (total * (1 + gst / 100)).toFixed(2);
         }
+
+		// Attach event listeners for real-time updates
+		document.getElementById("manualCost").addEventListener("input", calculateTotal);
+		document.getElementById("cost").addEventListener("input", calculateTotal);
 
         productDropdown.addEventListener("change", updateGSTAndCategory);
         categoryDropdown.addEventListener("change", updateSubCategory);
-        subCategoryDropdown.addEventListener("change", updateCost);
+        //subCategoryDropdown.addEventListener("change", updateCost);
+		subCategoryDropdown.addEventListener("change", updateSize);
         quantityField.addEventListener("input", calculateTotal);
         lengthField.addEventListener("input", calculateTotal);
         widthField.addEventListener("input", calculateTotal);
-        gstDropdown.addEventListener("change", calculateTotal);
+        //gstInput.addEventListener("change", calculateTotal);
+        //gstDropdown.addEventListener("change", calculateTotal);
     });
 </script>
 
@@ -1038,19 +1239,44 @@
 
 
 
+<script>
+	document.getElementById("manualCostRadio").addEventListener("change", function() {
+		const manualInputs = document.getElementById("manualInputs");
+		const manualInputs2 = document.getElementById("manualInputs2");
+	
+		// Select specific input fields
+		const manualCostInput = document.getElementById("manualCost");
+		const remarksInput = document.getElementById("remarks");
+	
+		// Show or hide the input containers
+		const isChecked = this.checked;
+		manualInputs.style.display = isChecked ? "flex" : "none";
+		manualInputs2.style.display = isChecked ? "flex" : "none";
+	
+		
+	});
+	
+	
+	
+</script>
+
+
 <!-- script for storing form entries -->
 
 <script>
 	document.addEventListener("DOMContentLoaded", function() {
 		const addButton = document.querySelector("button[type='button']");
 		const submitButton = document.getElementById("submitButton");
+		const bill_and_payButton = document.getElementById("billAndPay");
 		const estimate = document.getElementById("estimate");
 		const quote = document.getElementById("quote");
 		const form = document.getElementById("form");
 		const tableBody = document.querySelector("#entriesTable tbody");
 		const grandTotalElement = document.getElementById("grandTotal");
-		const grandTotalGSTElement = document.getElementById("grandTotalGST");
+		//const grandTotalGSTElement = document.getElementById("grandTotalGST");
 		const customProductDescription = document.getElementById("custom-product-description");
+		const manualCost = document.getElementById("manualCost");
+		const remarks = document.getElementById("remarks");
 	
 		// Function to check if all required fields are filled
 		function checkRequiredFields() {
@@ -1063,6 +1289,8 @@
 		function checkTableData() {
 			let hasRows = tableBody.children.length > 0;
 			submitButton.disabled = !hasRows;
+			bill_and_payButton.style.pointerEvents = "auto"; // Disables clicking
+			bill_and_payButton.style.opacity = "1"; // Makes it visually appear disabled
 			estimate.disabled = !hasRows;
 			quote.disabled = !hasRows;
 			calculateGrandTotal();
@@ -1075,12 +1303,12 @@
 			
 			document.querySelectorAll("#entriesTable tbody tr").forEach(row => {
 				let cells = row.querySelectorAll("td");
-				total += parseFloat(cells[14].textContent) || 0;
-				totalWithGst += parseFloat(cells[15].textContent) || 0;
+				total += parseFloat(cells[6].textContent) || 0;
+				totalWithGst += parseFloat(cells[6].textContent) || 0;
 			});
 	
 			grandTotalElement.textContent = total.toFixed(2);
-			grandTotalGSTElement.textContent = totalWithGst.toFixed(2);
+			//grandTotalGSTElement.textContent = totalWithGst.toFixed(2);
 		}
 	
 		// Check fields on input change
@@ -1090,8 +1318,9 @@
 
 		// Function to clear only specific fields after adding an entry
 		function clearNonCustomerFields() {
-			let fieldsToClear = ["product","custom-product-description", "category", "subcategory", "length", "width", "quantity", "gst", "hsn", "cost", "total", "total_with_gst"];
-			
+			let fieldsToClear = ["product","custom-product-description", "category", "subcategory", "length", "width", "quantity", "cost", "total", "total_with_gst", "total_sqft","remarks","size","manualCost"];
+			let checkbox = document.getElementById("manualCostRadio");
+			checkbox.checked = false;
 			fieldsToClear.forEach(id => {
 				let field = document.getElementById(id);
 				if (field) {
@@ -1105,134 +1334,189 @@
 		addButton.addEventListener("click", function() {
 			let customerInput = document.getElementById("search").value.trim();
 			let customerData = customerInput.split("--");
+		
+			let customerId = customerData[0] || "";
+			let customerName = customerData[1] || "";
+			let customerPhone = customerData[2] || "";
+		
+			let length = document.getElementById("length").value.trim();
+			let width = document.getElementById("width").value.trim();
+			let totalSqft = document.getElementById("total_sqft").value.trim();
+		
+			let row = document.createElement("tr");
+			let dimention = document.getElementById("size").value.trim();
+
+		
+			// Calculate area from dimension (assuming it's in "3 x 2" format)
+			//let dimentionParts = dimention.split("x").map(num => num.trim()); // Split and trim spaces
+			//let area = (dimentionParts.length === 2) ? `${dimention} = ${dimentionParts[0] * dimentionParts[1]}` : dimention;
+
+			// Handle both "x" and "*" as separators
+			let dimentionParts = dimention.split(/[*x]/).map(num => num.trim()); 
+
+			let area = (dimentionParts.length === 2) 
+    			? `${dimention} = ${dimentionParts[0] * dimentionParts[1]}` 
+    			: dimention;
+
+			 // Get the current number of rows to determine the S.No
+			 let serialNumber = tableBody.rows.length + 1;
+			 let manualCostValue = document.getElementById("manualCost").value.trim();
+
+			 let costDisplay = manualCostValue ? `${document.getElementById("cost").value} / ${manualCostValue}` : document.getElementById("cost").value + " / None";
+			 const remarksValue = document.getElementById("remarks").value.trim();
+			 const storedValue = remarksValue ? remarksValue : "None";
+		
+			row.innerHTML = `
+				<td>${serialNumber}</td>
+				<td class="specs">${document.getElementById("product").value},<br>${document.getElementById("category").value},<br>${document.getElementById("subcategory").value}</td>
+				<td>${area}</td> <!-- New column for dimension calculation -->
+				<td>${document.getElementById("quantity").value}</td>
+				<td>${document.getElementById("size").value}</td>
+				<td>${costDisplay} </td>
+				<td>${document.getElementById("total").value}</td>
+				<td style="word-wrap: break-word; 
+				white-space: normal;
+				max-width: 200px;">${storedValue}</td>
+				<td><button type="button" class="btn btn-danger btn-sm delete">Delete</button></td>
+			`;
+
+		
+			tableBody.appendChild(row);
+		
+			// Clear only the required fields
+			clearNonCustomerFields();
+			checkRequiredFields();
+			checkTableData();
+		});
+		
+	
+		// Delete row functionality
+		
+
+		tableBody.addEventListener("click", function(event) {
+			if (event.target.classList.contains("delete")) {
+				event.target.closest("tr").remove();
+				
+				// Reorder S.No after deletion
+				[...tableBody.rows].forEach((row, index) => {
+					row.cells[0].textContent = index + 1;
+				});
+
+				checkTableData();
+			}
+		});
+		
+	
+		// Function to collect table data
+		function collectTableData() {
+			let customerInput = document.getElementById("search").value.trim();
+			let customerData = customerInput.split("--");
 	
 			let customerId = customerData[0] || "";
 			let customerName = customerData[1] || "";
 			let customerPhone = customerData[2] || "";
-	
-			let length = document.getElementById("length").value.trim();
-			let width = document.getElementById("width").value.trim();
-	
-			let row = document.createElement("tr");
-	
-			row.innerHTML = `
-				<td>${document.querySelector("input[disabled]").value}</td>
-				<td>${customerId}</td>
-				<td>${customerName}</td>
-				<td>${customerPhone}</td>
-				<td>${document.getElementById("product").value}</td>
-				<td>${document.getElementById("custom-product-description")?.value || "NONE"}</td>
-				<td>${document.getElementById("category").value}</td>
-				<td>${document.getElementById("subcategory").value}</td>
-				<td>${length ? length : "None"}</td>
-				<td>${width ? width : "None"}</td>
-				<td>${document.getElementById("quantity").value}</td>
-				<td>${document.getElementById("gst").value}</td>
-				<td>${document.getElementById("hsn").value}</td>
-				<td>${document.getElementById("cost").value}</td>
-				<td>${document.getElementById("total").value}</td>
-				<td>${document.getElementById("total_with_gst").value}</td>
-				<td><button type="button" class="btn btn-danger btn-sm delete">Delete</button></td>
-			`;
-	
-			tableBody.appendChild(row);
-	
-			 // Clear only the required fields
-			 clearNonCustomerFields();
-			checkRequiredFields();
-			checkTableData();
-		});
-	
-		// Delete row functionality
-		tableBody.addEventListener("click", function(event) {
-			if (event.target.classList.contains("delete")) {
-				event.target.closest("tr").remove();
-				checkTableData();
-			}
-		});
-	
-		// Function to collect table data
-		function collectTableData() {
+			let BillId = document.getElementById("billId").value;
 			let entries = [];
+
 			document.querySelectorAll("#entriesTable tbody tr").forEach(row => {
 				let cells = row.querySelectorAll("td");
+				console.log("*************",cells[4].textContent);
 				let entry = {
-					bill_id: cells[0].textContent,
-					customer_id: cells[1].textContent,
-					customer_name: cells[2].textContent,
-					customer_phone: cells[3].textContent,
-					product: cells[4].textContent,
-					custom: cells[5].textContent,
-					category: cells[6].textContent,
-					sub_category: cells[7].textContent,
-					length: cells[8].textContent,
-					width: cells[9].textContent,
-					quantity: cells[10].textContent,
-					gst: cells[11].textContent,
-					hsn: cells[12].textContent,
-					cost: cells[13].textContent,
-					total: cells[14].textContent,
-					total_with_gst: cells[15].textContent
+					s_no: cells[0].textContent,
+					//customer_id: cells[1].textContent,
+					//customer_name: cells[2].textContent,
+					//customer_phone: cells[3].textContent,
+					product: cells[1].textContent,
+					//custom: cells[2].textContent,
+					//category: cells[3].textContent,
+					//sub_category: cells[4].textContent,
+					//length: cells[5].textContent,
+					//width: cells[6].textContent,
+					dimension : cells[2].textContent,
+					//total_sqft: cells[7].textContent,
+					quantity: cells[3].textContent,
+					size: cells[4].textContent,
+					//gst: cells[].textContent,
+					//hsn: cells[10].textContent,
+					cost: cells[5].textContent,
+					total: cells[6].textContent,
+					remarks: cells[7].textContent
 				};
 				entries.push(entry);
 			});
-			console.log(grandTotalGSTElement.textContent);
+			//console.log(grandTotalGSTElement.textContent);
 	
 			return {
 				entries: entries,
 				grand_total: parseFloat(grandTotalElement.textContent),
-				grand_total_with_gst: parseFloat(grandTotalGSTElement.textContent)
+				grand_total_with_gst: "No values",
+				customer_id: customerId,
+				customer_name: customerName,
+				customer_phone: customerPhone,
+				bill_id : BillId
+				
 			};
 		}
 	
 		// Submit form and send all table data
-		function submitData(url) {
-			let data = collectTableData();
-		
-			fetch(url, {
-				method: "POST",
-				headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
-				body: JSON.stringify(data)
-			})
-			.then(response => {
-				if (response.redirected) {
-					alert("Form submitted successfully!");
-					setTimeout(() => {
-						window.location.href = response.url;  // Redirect after alert
-					}, 500);  // Adjust delay if needed
-				} else {
-					return response.json();
-				}
-			})
-			.then(data => {
-				if (data && data.message) {
-					alert(data.message);
-				}
-			})
-			.catch(error => console.error("Error:", error));
-		}
-		
-	
-		submitButton.addEventListener("click", function() {
-			submitData("/bill/");
-		});
-	
-		estimate.addEventListener("click", function() {
-			submitData("/estimate/");
-		});
-	
-		quote.addEventListener("click", function() {
-			submitData("/quote/");
-		});
+			function submitData(url, extraData = {}) {
+				let data = collectTableData();
+
+				// Merge extraData into data
+				Object.assign(data, extraData);
+
+				fetch(url, {
+					method: "POST",
+					headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+					body: JSON.stringify(data)
+				})
+				.then(response => {
+					if (response.redirected) {
+						alert("Form submitted successfully!");
+						setTimeout(() => {
+							window.location.href = response.url;  // Redirect after alert
+						}, 500);  // Adjust delay if needed
+					} else {
+						return response.json();
+					}
+				})
+				.then(data => {
+					if (data && data.message) {
+						alert(data.message);
+					}
+				})
+				.catch(error => console.error("Error:", error));
+			}
+
+			submitButton.addEventListener("click", function() {
+				submitData("/bill/");
+			});
+
+			bill_and_payButton.addEventListener("click", function() {
+				submitData(`/bill_and_pay/${{ new_id }}`);  // Example extra data
+			});
+
+			estimate.addEventListener("click", function() {
+				submitData("/estimate/");
+			});
+
+			quote.addEventListener("click", function() {
+				submitData("/quote/");
+			});
+
 	
 		// Disable buttons initially
 		addButton.disabled = true;
 		submitButton.disabled = true;
+		bill_and_payButton.style.pointerEvents = "none"; // Disables clicking
+		bill_and_payButton.style.opacity = "0.7"; // Makes it visually appear disabled
 		estimate.disabled = true;
 		quote.disabled = true;
 	});
 	
 </script>
+
+
 
 	
 </body>
