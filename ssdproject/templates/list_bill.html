@@ -444,12 +444,12 @@
 								<a title="Add Payment" href="{% url "addpayment" item.Bill_Id %}"><button type="button" class="btn btn-default ion icon ion-md-cash"></button></a> 
 								{% comment %} <a class="del-btn" href=""><button type="button" class="btn btn-default ion icon ion-md-cash waves-effect"></button></a> {% endcomment %}
 							</div>`,
-					status: `<span style="color: 
+					status: `<span style="background-color: 
 					{% if item.Fully_Paid == 1 and item.Force_Paid == 0 %}green
 					{% elif item.Partialy_Paid == 1 %}orange
 					{% elif item.Not_Paid == 1 %}blue
 					{% elif item.Force_Paid == 1 and item.Fully_Paid == 1 %}red
-					{% else %}black{% endif %};">
+					{% else %}black{% endif %}; color:#fff; padding:10px">
 
 
 					{% if item.Fully_Paid == 1 and item.Force_Paid == 0 %}Fully Paid

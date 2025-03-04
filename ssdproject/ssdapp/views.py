@@ -20,6 +20,12 @@ from django.contrib.auth import authenticate,login,logout
 
 from datetime import datetime,date,timedelta
 
+import os
+from django.core.files.storage import default_storage
+# from django.http import JsonResponse
+import requests
+from django.views.decorators.csrf import csrf_exempt
+
 # Create your views here.
 
        
@@ -775,7 +781,8 @@ def add_employee(request):
 
     return render(request, 'add_employee.html', context)
 
-
+@login_required(login_url='signin')
+@user_passes_test(is_admin)  # Only admin can add employees
 def list_employee(request):
     data = Employee.objects.all()
     context = {'data':data}
@@ -783,7 +790,7 @@ def list_employee(request):
    
     return render(request,'list_employee.html',context)
 
-
+@login_required(login_url='signin')
 def invoice(request,id):
     splitted_billId = id.split("-")
     billId = splitted_billId[0]
@@ -818,7 +825,7 @@ def signout(request):
     return redirect("signin")
 
 
-
+@login_required(login_url='signin')
 def add_payment(request, id):
     if request.method == "POST":
         try:
@@ -895,7 +902,7 @@ def add_payment(request, id):
     context = {'data': data,'new_pay_id' : new_pay_id}
     return render(request, "add_payment.html", context)
 
-
+@login_required(login_url='signin')
 def list_payment(request,id):
     data = Payment_Master.objects.filter(Payment_Id__startswith=id)
     context = {'data':data}
@@ -1001,5 +1008,43 @@ def bill_and_pay(request,id):
 
 
 
+@csrf_exempt
+def upload_pdf(request):
+    if request.method == "POST" and request.FILES.get("pdf_file"):
+        pdf_file = request.FILES["pdf_file"]
+        whatsapp_number = request.POST.get("whatsapp_number")
 
+        file_path = os.path.join("media", pdf_file.name)
+        file_url = request.build_absolute_uri("/media/" + pdf_file.name)
+
+        with default_storage.open(file_path, "wb") as destination:
+            for chunk in pdf_file.chunks():
+                destination.write(chunk)
+
+        response = send_pdf_whatsapp(whatsapp_number, file_url)
+        return JsonResponse(response)
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
+def send_pdf_whatsapp(to_number, pdf_url):
+    access_token = "your_access_token"
+    phone_number_id = "your_phone_number_id"
+
+    url = f"https://graph.facebook.com/v17.0/{phone_number_id}/messages"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "messaging_product": "whatsapp",
+        "to": to_number,
+        "type": "document",
+        "document": {
+            "link": pdf_url,
+            "filename": "invoice.pdf"
+        }
+    }
+
+    response = requests.post(url, headers=headers, json=data)
+    return response.json()
 

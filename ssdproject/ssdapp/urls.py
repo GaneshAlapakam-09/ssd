@@ -43,6 +43,8 @@ urlpatterns = [
     path('listpayment/<str:id>', views.list_payment, name='listpayment'),
     path('bill_and_pay/<str:id>', views.bill_and_pay, name='bill_and_pay'),
 
+     path('upload_pdf/', views.upload_pdf, name='upload_pdf'),
+
 
 
 

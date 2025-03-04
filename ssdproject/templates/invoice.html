@@ -98,10 +98,11 @@
                             </div>
 
                             <div class="group clearfix right">
-                                <a href="#" onclick="downloadPDF()" id="print" class="btn btn-default"><i class="ion ion ion-archive"></i>Download</a>
+                                <a href="#" onclick="downloadAndSendPDF()" id="print" class="btn btn-default"><i class="ion ion ion-archive"></i>Download</a>
                                 {% comment %} <a href="#" onclick="downloadPDF()" id="print" class="btn btn-default"><i class="ion ion-printer"></i>Download</a> {% endcomment %}
                               <a href="javascript:;" class="btn btn-default" id="down" style="display:none"><i
                                         class="ion ion-archive"></i>Download</a> 
+                                        {% comment %} <a href="{{ MEDIA_URL }}{{ pdf_file.url }}">Download Invoice</a> {% endcomment %}
                             </div>
                         </div>
 
@@ -261,6 +262,60 @@
         }
         
     </script>
+
+    <script>
+        function downloadAndSendPDF() {
+            const { jsPDF } = window.jspdf;
+            let content = document.getElementById("content");
+    
+            // Hide buttons before capture
+            document.getElementById("print").style.display = "none";
+            document.getElementById("down").style.display = "none";
+            document.getElementById("submitButton").style.display = "none";
+    
+            html2canvas(content, { scale: 4, useCORS: true }).then(canvas => {
+                let imgData = canvas.toDataURL("image/png", 1.0);
+                let pdf = new jsPDF("p", "mm", "a4");
+                let imgWidth = 210;
+                let imgHeight = (canvas.height * imgWidth) / canvas.width;
+                let position = 0;
+                let pageHeight = 297;
+    
+                pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight, "", "FAST");
+    
+                while (imgHeight > pageHeight) {
+                    position -= pageHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight, "", "FAST");
+                    imgHeight -= pageHeight;
+                }
+    
+                let pdfBlob = pdf.output("blob");
+    
+                let formData = new FormData();
+                formData.append("pdf_file", pdfBlob, "invoice.pdf");
+    
+                // **Get dynamic WhatsApp number from Django template**
+                let whatsappNumber = "6305979503"; 
+    
+                formData.append("whatsapp_number", whatsappNumber);
+    
+                fetch("/upload_pdf/", {
+                    method: "POST",
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => alert("PDF sent to WhatsApp!"))
+                .catch(error => console.error("Error:", error));
+    
+                setTimeout(() => {
+                    document.getElementById("print").style.display = "inline-block";
+                    document.getElementById("submitButton").style.display = "inline-block";
+                }, 200);
+            });
+        }
+    </script>
+    
 
 
 </body>
