@@ -442,7 +442,7 @@
 								<a title="Bill Details" href="{% url "billdetails" item.Bill_Id %}"><button type="button" class="btn btn-default ion icon fa fa-list-ol"></button></a>
 								<a title="List Payments" href="{% url "listpayment" item.Bill_Id %}"><button type="button" class="btn btn-default ion icon ion-md-paper"></button></a> 
 								<a title="Add Payment" href="{% url "addpayment" item.Bill_Id %}"><button type="button" class="btn btn-default ion icon ion-md-cash"></button></a> 
-								{% comment %} <a class="del-btn" href=""><button type="button" class="btn btn-default ion icon ion-md-cash waves-effect"></button></a> {% endcomment %}
+								<a href="{% url "overallinvoice" item.Bill_Id %}"><button type="button" class="btn btn-default fa fa-print icon  waves-effect"></button></a>
 							</div>`,
 					status: `<span style="background-color: 
 					{% if item.Fully_Paid == 1 and item.Force_Paid == 0 %}green
@@ -455,7 +455,7 @@
 					{% if item.Fully_Paid == 1 and item.Force_Paid == 0 %}Fully Paid
 					{% elif item.Partialy_Paid == 1 %}Partially Paid
 					{% elif item.Not_Paid == 1 %}Not Paid
-					{% elif item.Force_Paid == 1 and item.Fully_Paid == 1 %}Force Paid
+					{% elif item.Force_Paid == 1 and item.Fully_Paid == 1 %}Terminated
 					{% else %}Unknown{% endif %}
 				</span>`
 				}{% if not loop.last %},{% endif %}

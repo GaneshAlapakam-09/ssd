@@ -105,6 +105,9 @@ class BillingMaster(models.Model):
     Grand_Total = models.IntegerField()
     Grand_Total_With_Gst = models.IntegerField()
     
+
+    Paid_Amount = models.IntegerField(default=0)
+    Pending_Amount = models.IntegerField(default=0)
     Fully_Paid = models.IntegerField(default=0)
     Partialy_Paid = models.IntegerField(default=0)
     Not_Paid = models.IntegerField(default=1)
@@ -257,9 +260,11 @@ class Employee(AbstractUser):
 
 class Payment_Master(models.Model):
     Payment_Id = models.CharField(max_length=50,primary_key=True)
+    Bill_Id = models.CharField(default="BILL0001", max_length=50)
     Grand_Total = models.IntegerField(default=0)
     Paid_Amount = models.IntegerField(default=0)
     Pending_Amount = models.IntegerField(default=0)
+
 
 
     
@@ -273,9 +278,10 @@ class Payment_Details(models.Model):
     Payment_Date = models.DateField(auto_now=True,auto_now_add=False)
     Paid_Amount = models.IntegerField(default=0)
     Pending_Amount = models.IntegerField(default=0)
-
     Payment_Mode = models.CharField(max_length=50)
     Utr_Or_Reason = models.CharField(max_length=50)
     Mobile_No = models.CharField(max_length=50)
+    Bill_Id = models.CharField(default="BILL0001", max_length=50)
+
 
 

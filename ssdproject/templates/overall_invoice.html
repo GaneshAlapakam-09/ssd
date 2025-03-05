@@ -69,6 +69,11 @@
             display: flex;
             align-items:center;
         }
+
+        .row.total-sum.total-sum2{
+            display:flex;
+            justify-content:end;
+        }
     </style>
 
 </head>
@@ -81,7 +86,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <!-- Invoice Start -->
-                    <button class="btn btn-primary mr5" type="submit" id="submitButton"  onclick="window.location.href='{% url "billdetails" data2.Bill_Id %}';">&larr; Back To Bill Details</button>
+                    <button class="btn btn-primary mr5" type="submit" id="submitButton"  onclick="window.location.href='{% url "listbill" %}';">&larr; Back To Bills List</button>
                     <div class="invoice-wrap" id= "content">
                         <div class="clearfix invoice-head">
 							<span>
@@ -93,7 +98,7 @@
                         <div class="clearfix invoice-subhead mb20">
                             <div class="group clearfix left">
                                 <p class="text-bold mb5">Bill No - {{ billId }}</p>
-                                <p class="text-bold mb5">Invoice No - {{ invoice_no }}</p>
+                                <p class="text-bold mb5">Invoice No - SSINV{{ invoice_no }}</p>
                                 <p class="small">Date: {{current_date}}</p>
                             </div>
 
@@ -156,28 +161,15 @@
                         <!-- #end invoice table -->
 
                         <div class="row total-sum ">
-                            <div class="col-md-4">
+                            <div class="col-md-12">
                                 <div class="clearfix text-right">
                                     <h3 class="text-uppercase text-bold">Total</h3>
                                     <h4 class="sum">₹{{data2.Grand_Total}}</h4>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="clearfix text-right ">
-                                    <h3 class="text-uppercase text-bold">Pending</h3>
-                                    <h4 class="sum">₹ {% if data4 %}{% for i in data4 %}{{i.Pending_Amount}}{% endfor %}{% else %}{{data2.Grand_Total}}{% endif %}</h4>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="clearfix text-right ">
-                                    <h3 class="text-uppercase text-bold">Paid</h3>
-                                    <h4 class="sum">₹ {% if data4 %}{% for i in data4 %}{{i.Paid_Amount}}{% endfor %}{% else %}0{% endif %}</h4>
-                                </div>
-                            </div>
+                          
                         </div>
 
-
-                        
                         <!-- invoice table -->
                         <table class="table table-bordered invoice-table mb30">
                             <thead>
@@ -204,6 +196,23 @@
                         </table>
                         <!-- #end invoice table -->
 
+                        <div class="row total-sum total-sum2">
+                            <div class="col-md-6">
+                                <div class="clearfix text-right ">
+                                    <h3 class="text-uppercase text-bold">Pending</h3>
+                                    <h4 class="sum">₹ {% if data4 %}{% for i in data4 %}{{i.Pending_Amount}}{% endfor %}{% else %}{{data2.Grand_Total}}{% endif %}</h4>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="clearfix text-right ">
+                                    <h3 class="text-uppercase text-bold">Paid</h3>
+                                    <h4 class="sum">₹ {% if data4 %}{% for i in data4 %}{{i.Paid_Amount}}{% endfor %}{% else %}0{% endif %}</h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% for i in data4 %}
+                        {% if i.Pending_Amount != 0 %}
                         <div class="row">
                             <div class="col-md-6 qrCode">
                                 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1200px-QR_code_for_mobile_English_Wikipedia.svg.png" width="200px" alt="">
@@ -211,6 +220,10 @@
     
                             </div>
                         </div>
+                        {% endif %}
+                        {% endfor %}
+
+                        
 
 
                         <!-- <div class="clearfix text-right total-sum ">

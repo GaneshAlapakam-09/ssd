@@ -233,7 +233,7 @@
 											<thead>
 												<tr>
 													<th>
-														 Payment ID
+														 Payment Mode
 														<div class="th">
 															<i class="fa fa-caret-up icon-up"></i>
 															<i class="fa fa-caret-down icon-down"></i>
@@ -241,14 +241,14 @@
 													</th>
 													
 													<th>
-                                                        Total Amount
+                                                        UTR or Reason
 														<div class="th">
 															<i class="fa fa-caret-up icon-up"></i>
 															<i class="fa fa-caret-down icon-down"></i>
 														</div>
 													</th>
 													<th>
-														Pending
+														Mobile No.
 														<div class="th">
 															<i class="fa fa-caret-up icon-up"></i>
 															<i class="fa fa-caret-down icon-down"></i>
@@ -270,7 +270,7 @@
 													</th>-->
 													
 													<th>
-														Action
+														Payment Date
 														<div class="th">
 															<i class="fa fa-caret-up icon-up"></i>
 															<i class="fa fa-caret-down icon-down"></i>
@@ -403,16 +403,12 @@
 			var datas = [
 				{% for item in data %}
 				{ 
-					Payment_Id: "{{ item.Payment_Id|escapejs }}", 
-					Grand_Total: "{{ item.Grand_Total|escapejs }}", 
-					Pending_Amount: "{{ item.Pending_Amount|escapejs }}", 
+					Payment_Mode: "{{item.Payment_Mode|escapejs }}", 
+					Utr_Or_Reason: "{{ item.Utr_Or_Reason|escapejs }}", 
+					Mobile_No: "{{ item.Mobile_No|escapejs }}", 
 					Paid_Amount: "{{ item.Paid_Amount|escapejs }}", 
-					action: `<div class="btn-group list-cust">
-								<a title="Ganerate Invoice" href="{% url 'invoice' item.Payment_Id %}"><button type="button" class="btn btn-default ion icon ion-md-paper"></button></a>
-								<a title="List Payments" href="{% url 'paymentterms' item.Payment_Id %}"><button type="button" class="btn btn-default ion icon ion-md-list"></button></a> 
-								{% comment %} <a title="Add Payment" href="#"><button type="button" class="btn btn-default ion icon ion-md-cash"></button></a>  {% endcomment %}
-								{% comment %} <a class="del-btn" href=""><button type="button" class="btn btn-default ion icon ion-md-cash waves-effect"></button></a> {% endcomment %}
-							</div>`
+					Payment_Date: "{{ item.Payment_Date|escapejs }}"
+					
 				}{% if not loop.last %},{% endif %}
 				{% endfor %}
 			];
@@ -420,11 +416,11 @@
 			var table = $table.DataTable({
 				data: datas,
 				columns: [
-					{ data: "Payment_Id" },
-					{ data: "Grand_Total" },
-					{ data: "Pending_Amount" },
+					{ data: "Payment_Mode" },
+					{ data: "Utr_Or_Reason" },
+					{ data: "Mobile_No" },
 					{ data: "Paid_Amount" },
-					{ data: "action" }
+					{ data: "Payment_Date" }
 				],
 				searching: true,
 				dom: "rtip",

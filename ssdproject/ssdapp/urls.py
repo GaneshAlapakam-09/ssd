@@ -45,6 +45,10 @@ urlpatterns = [
 
      path('upload_pdf/', views.upload_pdf, name='upload_pdf'),
 
+    path('overallinvoice/<str:id>', views.overall_invoice, name='overallinvoice'),
+    path('paymentterms/<str:id>', views.list_payments_terms, name='paymentterms'),
+
+
 
 
 

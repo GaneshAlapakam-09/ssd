@@ -496,6 +496,7 @@ def bill(request):
                     Phone_No=data.get("customer_phone"),
                     Grand_Total = int(data.get("grand_total", 0)) if data.get("grand_total") not in [None, "", "None"] else 0,
                     Grand_Total_With_Gst = 0,
+                    Pending_Amount = int(data.get("grand_total", 0)) if data.get("grand_total") not in [None, "", "None"] else 0
                 )
                
 
@@ -799,8 +800,9 @@ def invoice(request,id):
         data2 = BillingMaster.objects.get(Bill_Id = billId , Status =1)
         data3 = CustomerDetails.objects.get(Customer_Id = data2.Customer_Id)
         data4 = Payment_Master.objects.filter(Payment_Id=id)
+        data5 = Payment_Details.objects.filter(Payment_Id=id)
         current_date = datetime.today()
-        context = {'data':data, 'data2':data2,'data3':data3,'current_date':current_date,'data4':data4,'billId':billId,'invoice_no':id}
+        context = {'data':data, 'data2':data2,'data3':data3,'current_date':current_date,'data4':data4,'billId':billId,'invoice_no':id,'data5':data5}
         return render(request,'invoice.html',context)
     elif id.startswith("ESTM"):
         data = EstimateDetails.objects.filter(Estimation_Id = id , Status =1)
@@ -842,9 +844,11 @@ def add_payment(request, id):
 
 
             
+            print("======+++++")
 
             paym_id = Payment_Master.objects.create(
                 Payment_Id=new_pay_id,
+                Bill_Id = id,
                 Grand_Total=int(float(data.get("totalAmount") or 0)),  # Ensure it's never None
                 Paid_Amount=int(float((data.get("totalAmount") or 0)) - int(float((data.get("finalPending") or 0)))),
                 Pending_Amount=int(float(data.get("finalPending") or 0)), 
@@ -855,6 +859,8 @@ def add_payment(request, id):
                 Fully_Paid=1 if data.get("finalPending") == "0.00" else 0,  # Fully paid if no pending amount
                 Partialy_Paid=1 if 0 < int(float((data.get("finalPending") or 0))) < int(float((data.get("totalAmount") or 0))) else 0,  # Partial payment
                 Not_Paid=1 if (data.get("totalAmount") or 0) == (data.get("finalPending") or 0) else 0,  # Not paid if pending = total
+                Paid_Amount = int(float(data.get("totalAmount"))) - int(float(data.get("finalPending"))),
+                Pending_Amount = int(float(data.get("finalPending")))
                 )
                 
             for entry in table_data:
@@ -868,6 +874,7 @@ def add_payment(request, id):
                     Payment_Mode=entry.get("payment_mode"),
                     Utr_Or_Reason=entry.get("utr_reason"),
                     Mobile_No=entry.get("mobile_number"),
+                    Bill_Id = id.split("-")[0]
                     
                 )
                 if entry.get("payment_mode") == "MANUAL CLOSE":
@@ -935,6 +942,7 @@ def bill_and_pay(request,id):
                     Phone_No=data.get("customer_phone"),
                     Grand_Total = int(data.get("grand_total", 0)) if data.get("grand_total") not in [None, "", "None"] else 0,
                     Grand_Total_With_Gst = 0,
+
                 )
                
 
@@ -1048,3 +1056,26 @@ def send_pdf_whatsapp(to_number, pdf_url):
     response = requests.post(url, headers=headers, json=data)
     return response.json()
 
+
+
+def overall_invoice(request,id):
+    
+    data = BillingDetails.objects.filter(Bill_Id = id , Status =1)
+    data2 = BillingMaster.objects.get(Bill_Id = id , Status =1)
+    data3 = CustomerDetails.objects.get(Customer_Id = data2.Customer_Id)
+    data4 = BillingMaster.objects.filter(Bill_Id=id)
+    data5 = Payment_Details.objects.filter(Bill_Id=id)
+    current_date = datetime.today()
+
+    context = {'data':data, 'data2':data2,'data3':data3,'current_date':current_date,'data4':data4,'billId':id,'invoice_no':id,'data5':data5}
+    return render(request,'overall_invoice.html',context)
+
+
+
+def list_payments_terms(request,id):
+    data=Payment_Details.objects.filter(Payment_Id = id)
+    for i in data:
+        print("00000",i.Paid_Amount)
+    context ={'data':data}
+    return render(request,'list_payment_terms.html',context)
+    pass
