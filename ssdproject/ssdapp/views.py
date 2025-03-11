@@ -844,7 +844,6 @@ def add_payment(request, id):
 
 
             
-            print("======+++++")
 
             paym_id = Payment_Master.objects.create(
                 Payment_Id=new_pay_id,
@@ -864,7 +863,6 @@ def add_payment(request, id):
                 )
                 
             for entry in table_data:
-                print(type(entry.get("pending_amount")))
 
                 Payment_Details.objects.create(
                     Payment_Id=paym_id,
@@ -1074,8 +1072,6 @@ def overall_invoice(request,id):
 
 def list_payments_terms(request,id):
     data=Payment_Details.objects.filter(Payment_Id = id)
-    for i in data:
-        print("00000",i.Paid_Amount)
     context ={'data':data}
     return render(request,'list_payment_terms.html',context)
     pass

@@ -18,7 +18,6 @@ class CustomerDetails(models.Model):
     Address = models.CharField(max_length=150)
     Status = models.IntegerField(default=1)
 
-
 class MaterialMaster(models.Model):
     Material_Id = models.CharField(primary_key=True, max_length=50)
     Material_Name = models.CharField( max_length=50)
@@ -52,9 +51,6 @@ class Invoice(models.Model):
 
     def __str__(self):
         return f"Invoice {self.invoice_number}"
-    
-
-
 
 class ProductMaster(models.Model):
     Product_Id = models.CharField(primary_key=True, max_length=50)
@@ -62,7 +58,6 @@ class ProductMaster(models.Model):
     GST = models.CharField(max_length=50)
     HSN_Code = models.CharField(max_length=50)
     Status = models.IntegerField(default=1)
-
 
     def __str__(self):
         return self.Product_Name
@@ -77,7 +72,6 @@ class CategoriesMaster(models.Model):
 
     def __str__(self):
         return self.Categories_Name
-    
 
 class CostMaster(models.Model):
     Cost_Id = models.CharField(primary_key = True , max_length=50)
@@ -96,7 +90,6 @@ class CostMaster(models.Model):
     def __str__(self):
         return self.Product_Name
     
-
 class BillingMaster(models.Model):
     Bill_Id = models.CharField(primary_key = True , max_length=50)
     Customer_Id = models.CharField(max_length=50)
@@ -112,8 +105,6 @@ class BillingMaster(models.Model):
     Partialy_Paid = models.IntegerField(default=0)
     Not_Paid = models.IntegerField(default=1)
     Force_Paid = models.IntegerField(default=0)
-
-
     Status = models.IntegerField(default=1)
 
 
@@ -149,8 +140,6 @@ class BillingDetails(models.Model):
     def __str__(self):
         return self.Bill_Id
     
-
-
 class QuoteMaster(models.Model):
     Quote_Id = models.CharField(primary_key = True , max_length=50)
     Customer_Id = models.CharField(max_length=50)
@@ -236,8 +225,6 @@ class EstimateDetails(models.Model):
     def __str__(self):
         return self.Estimation_Id
     
-
-
 class Employee(AbstractUser):
     ROLE_CHOICES = [
         ('admin', 'Admin'),
@@ -256,21 +243,12 @@ class Employee(AbstractUser):
     groups = models.ManyToManyField(Group, related_name="employee_groups", blank=True)
     user_permissions = models.ManyToManyField(Permission, related_name="employee_permissions", blank=True)
 
-
-
 class Payment_Master(models.Model):
     Payment_Id = models.CharField(max_length=50,primary_key=True)
     Bill_Id = models.CharField(default="BILL0001", max_length=50)
     Grand_Total = models.IntegerField(default=0)
     Paid_Amount = models.IntegerField(default=0)
     Pending_Amount = models.IntegerField(default=0)
-
-
-
-    
-    
-    
-
 
 class Payment_Details(models.Model):
     Payment_Id = models.ForeignKey("ssdapp.Payment_Master", on_delete=models.CASCADE)
@@ -282,6 +260,3 @@ class Payment_Details(models.Model):
     Utr_Or_Reason = models.CharField(max_length=50)
     Mobile_No = models.CharField(max_length=50)
     Bill_Id = models.CharField(default="BILL0001", max_length=50)
-
-
-
