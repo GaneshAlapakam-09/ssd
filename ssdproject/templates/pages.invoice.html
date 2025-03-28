@@ -10,18 +10,21 @@
 	<!-- <base href="/"> -->
 
 	<title>Materia - Admin Template</title>
+
+	{% load static %}
+	<link rel="icon" type="image/x-icon" href="{% static 'images/SS_LOGO.png' %}">
 	
 	<!-- Icons -->
-	<link rel="stylesheet" href="fonts/ionicons/css/ionicons.min.css">
-	<link rel="stylesheet" href="fonts/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" href="{% static 'fonts/ionicons/css/ionicons.min.css' %}">
+	<link rel="stylesheet" href="{% static 'fonts/font-awesome/css/font-awesome.min.css' %}">
 
 	<!-- Plugins -->
-	<link rel="stylesheet" href="styles/plugins/waves.css">
-	<link rel="stylesheet" href="styles/plugins/perfect-scrollbar.css">
+	<link rel="stylesheet" href="{% static 'styles/plugins/waves.css' %}">
+	<link rel="stylesheet" href="{% static 'styles/plugins/perfect-scrollbar.css' %}">
 	
 	<!-- Css/Less Stylesheets -->
-	<link rel="stylesheet" href="styles/bootstrap.min.css">
-	<link rel="stylesheet" href="styles/main.min.css">
+	<link rel="stylesheet" href="{% static 'styles/bootstrap.min.css' %}">
+	<link rel="stylesheet" href="{% static 'styles/main.min.css' %}">
 
 
 	 
@@ -649,15 +652,16 @@
 
 	
 
+	{% load static %}
 	<!-- Dev only -->
 	<!-- Vendors -->
-	<script src="scripts/vendors.js"></script>
+	<script src="{% static 'scripts/vendors.js' %}"></script>
 
 
-	<script src="scripts/plugins/screenfull.js"></script>
-	<script src="scripts/plugins/perfect-scrollbar.min.js"></script>
-	<script src="scripts/plugins/waves.min.js"></script>
-	<script src="scripts/app.js"></script>
+	<script src="{% static 'scripts/plugins/screenfull.js' %}"></script>
+	<script src="{% static 'scripts/plugins/perfect-scrollbar.min.js' %}"></script>
+	<script src="{% static 'scripts/plugins/waves.min.js' %}"></script>
+	<script src="{% static 'scripts/app.js' %}"></script>
 
 </body>
 </html>

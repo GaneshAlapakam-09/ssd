@@ -11,12 +11,13 @@
 
 	<title>SSD</title>
 	
-	{% load static %}
+
 
 
 
 
 {% load static %}
+<link rel="icon" type="image/x-icon" href="{% static 'images/SS_LOGO.png' %}">
 
 <!-- Icons -->
 <link rel="stylesheet" href="{% static 'fonts/ionicons/css/ionicons.min.css' %}">
@@ -78,60 +79,137 @@
 
 	<!-- main-container -->
 	<div class="main-container clearfix">
-		<!-- main-navigation -->
-		<aside class="nav-wrap" id="site-nav" data-perfect-scrollbar>
-			<div class="nav-head">
-				<!-- site logo -->
-				<a class="site-logo text-uppercase">
-					<i class="ion ion-disc"></i>
-					<span class="text">SS Digitals</span>
-				</a>
-			</div>
+	<!-- main-navigation -->
+	<aside class="nav-wrap" id="site-nav" data-perfect-scrollbar>
+		<div class="nav-head">
+			<!-- site logo -->
+			<a class="site-logo text-uppercase">
+				{% comment %} <i class="ion ion-disc"></i> {% endcomment %}
+				<img src="{% static 'images/SS_LOGO.png' %}" alt="">
+				<span class="text">SS Digitals</span>
+			</a>
+		</div>
 
-			<!-- Site nav (vertical) -->
+		<!-- Site nav (vertical) -->
 
-			<nav class="site-nav clearfix" role="navigation">
+		<nav class="site-nav clearfix" role="navigation">
+			
+
+			<!-- navigation -->
+			<ul class="list-unstyled clearfix nav-list mb15">
+				<li class="active">
+					<a>
+						<i class="ion ion-monitor"></i>
+						<span class="text">Dashboard</span>
+					</a>
+				</li>
+				{% comment %} <li>
+					<a>
+						<i class="icon ion-md-people"></i>
+						<span class="text">Customer Management</span>
+					</a>
+				</li> {% endcomment %}
+				<li>
+					<a href="javascript:;">
+						<i class="icon ion-md-people"></i>
+						<span class="text">Customer Management</span>
+						{% comment %} <i class="icon ion-md-arrow"></i> {% endcomment %}
+					</a>
+					<ul class="inner-drop list-unstyled">
+						<li><a href="{% url "addcustomer" %}">Add Customer</a></li>
+						<li><a href="{% url "listcustomer" %}">List Customer</a></li>
+					</ul>
+				</li>
+				{% if user.role == 'admin' %}
+				<li>
+					<a href="javascript:;">
+						<i class="icon ion-md-contact"></i>
+						<span class="text">Employee Management</span>
+						{% comment %} <i class="icon ion-md-arrow"></i> {% endcomment %}
+					</a>
+					<ul class="inner-drop list-unstyled">
+						<li><a href="{% url "addemployee" %}">Add Cost</a></li>
+						<li><a href="{% url "listemployee" %}">List Cost</a></li>
+					</ul>
+				</li>
+				<li>
+					<a href="javascript:;">
+						<i class="icon ion-md-cube"></i>
+						<span class="text">Material Management</span>
+						{% comment %} <i class="icon ion-md-arrow"></i> {% endcomment %}
+					</a>
+					<ul class="inner-drop list-unstyled">
+						<li><a href="{% url "addmaterial" %}">Add Material</a></li>
+						<li><a href="{% url "listmaterial" %}">List Material</a></li>
+					</ul>
+				</li>
+				<li>
+					<a href="javascript:;">
+						<i class="icon ion-logo-dropbox"></i>
+						<span class="text">Inward Management</span>
+						{% comment %} <i class="icon ion-md-arrow"></i> {% endcomment %}
+					</a>
+					<ul class="inner-drop list-unstyled">
+						{% comment %} <li><a href="{% url "addmaterial" %}">Add Material</a></li> {% endcomment %}
+						<li><a href="{% url "listinward" %}">List Inward</a></li>
+					</ul>
+				</li>
+				<li>
+					<a href="javascript:;">
+						<i class="icon ion-md-albums"></i>
+						<span class="text">Product Management</span>
+						{% comment %} <i class="icon ion-md-arrow"></i> {% endcomment %}
+					</a>
+					<ul class="inner-drop list-unstyled">
+						<li><a href="{% url "addproduct" %}">Add Product</a></li>
+						<li><a href="{% url "listproduct" %}">List Product</a></li>
+					</ul>
+				</li>
+				<li>
+					<a href="javascript:;">
+						<i class="icon ion-md-apps"></i>
+						<span class="text">Category Management</span>
+						{% comment %} <i class="icon ion-md-arrow"></i> {% endcomment %}
+					</a>
+					<ul class="inner-drop list-unstyled">
+						<li><a href="{% url "addcategories" %}">Add Category</a></li>
+						<li><a href="{% url "listcategories" %}">List Category</a></li>
+					</ul>
+				</li>
+				<li>
+					<a href="javascript:;">
+						<i class="icon ion-md-cash"></i>
+						<span class="text">Cost Management</span>
+						{% comment %} <i class="icon ion-md-arrow"></i> {% endcomment %}
+					</a>
+					<ul class="inner-drop list-unstyled">
+						<li><a href="{% url "addcost" %}">Add Cost</a></li>
+						<li><a href="{% url "listcost" %}">List Cost</a></li>
+					</ul>
+				</li>
+				{% endif %}
+				<li>
+					<a href="javascript:;">
+						<i class="icon ion-md-paper"></i>
+						<span class="text">Billing Management</span>
+						{% comment %} <i class="icon ion-md-arrow"></i> {% endcomment %}
+					</a>
+					<ul class="inner-drop list-unstyled">
+						<li><a href="{% url "bill" %}">Add Bill</a></li>
+						<li><a href="{% url "listbill" %}">List Bill</a></li>
+						<li><a href="{% url "listquote" %}">List Quotation</a></li>
+						<li><a href="{% url "listestimate" %}">List Estimation</a></li>
+					</ul>
+				</li>
+
 				
-
-				<!-- navigation -->
-				<ul class="list-unstyled clearfix nav-list mb15">
-					<li class="active">
-						<a>
-							<i class="ion ion-monitor"></i>
-							<span class="text">Dashboard</span>
-						</a>
-					</li>
-					<li>
-						<a href="javascript:;">
-							<i class="icon ion-md-people"></i>
-							<span class="text">Customer Management</span>
-							{% comment %} <i class="icon ion-md-arrow"></i> {% endcomment %}
-						</a>
-						<ul class="inner-drop list-unstyled">
-							<li><a href="{% url "addcustomer" %}">Add Customer</a></li>
-							<li><a href="{% url "listcustomer" %}">List Customer</a></li>
-						</ul>
-					</li>
-					<li>
-						<a href="javascript:;">
-							<i class="icon ion-md-cube"></i>
-							<span class="text">Material Management</span>
-							{% comment %} <i class="icon ion-md-arrow"></i> {% endcomment %}
-						</a>
-						<ul class="inner-drop list-unstyled">
-							<li><a href="{% url "addmaterial" %}">Add Material</a></li>
-							<li><a href="{% url "listmaterial" %}">List Material</a></li>
-						</ul>
-					</li>
-
-					
-					
-				</ul> <!-- #end navigation -->
-			</nav>
+				
+			</ul> <!-- #end navigation -->
+		</nav>
 
 
-		</aside>
-		<!-- #end main-navigation -->
+	</aside>
+	<!-- #end main-navigation -->
 
 		<div class="content-container fixedHeader nav-expand">
 		<!-- Data Table -->
@@ -296,30 +374,9 @@
 
 	<!-- Dev only -->
 	<!-- Vendors -->
-	{% comment %} {% load static %}
-
-	<script src="{% static 'scripts/vendors.js' %}"></script>
-	<script src="{% static 'scripts/d3.min.js' %}"></script>
-	<script src="{% static 'scripts/c3.min.js' %}"></script>
-	<script src="{% static 'scripts/screenfull.js' %}"></script>
-	<script src="{% static 'scripts/perfect_scrollbar.min.js' %}"></script>
-	<script src="{% static 'scripts/waves.min.js' %}"></script>
-	<script src="{% static 'scripts/jquery.sparkline.min.js' %}"></script>
-	<script src="{% static 'scripts/jquery.easypiechart.min.js' %}"></script>
-	<script src="{% static 'scripts/bootstrap_rating.min.js' %}"></script>
-	<script src="{% static 'scripts/app.js' %}"></script>
-	<script src="{% static 'scripts/index.init.js' %}"></script> {% endcomment %}
-
+	
 	{% load static %}
-{% comment %} 
-<script src="{% static 'scripts/vendors.js' %}"></script>
 
-<script src="{% static 'scripts/plugins/screenfull.js' %}"></script>
-<script src="{% static 'scripts/plugins/perfect-scrollbar.min.js' %}"></script>
-<script src="{% static 'scripts/plugins/waves.min.js' %}"></script>
-<script src="{% static 'scripts/plugins/jquery.dataTables.min.js' %}"></script>
-<script src="{% static 'scripts/app.js' %}"></script>
-<script src="{% static 'scripts/tables.init.js' %}"></script> {% endcomment %}
 
 
 	

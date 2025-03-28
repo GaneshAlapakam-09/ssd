@@ -12,6 +12,7 @@
 	<title>SSD</title>
 	
 	{% load static %}
+	<link rel="icon" type="image/x-icon" href="{% static 'images/SS_LOGO.png' %}">
 
 <!-- Font Styles -->
 <link rel="stylesheet" href="{% static 'fonts/font-awesome/css/font-awesome.min.css' %}">
@@ -78,7 +79,8 @@
 			<div class="nav-head">
 				<!-- site logo -->
 				<a class="site-logo text-uppercase">
-					<i class="ion ion-disc"></i>
+					{% comment %} <i class="ion ion-disc"></i> {% endcomment %}
+					<img src="{% static 'images/SS_LOGO.png' %}" alt="">
 					<span class="text">SS Digitals</span>
 				</a>
 			</div>
@@ -91,7 +93,7 @@
 				<!-- navigation -->
 				<ul class="list-unstyled clearfix nav-list mb15">
 					<li class="active">
-						<a>
+						<a href="{% url "dashboard" %}">
 							<i class="ion ion-monitor"></i>
 							<span class="text">Dashboard</span>
 						</a>
@@ -115,6 +117,17 @@
 					</li>
 					<li>
 						<a href="javascript:;">
+							<i class="icon ion-md-contact"></i>
+							<span class="text">Employee Management</span>
+							{% comment %} <i class="icon ion-md-arrow"></i> {% endcomment %}
+						</a>
+						<ul class="inner-drop list-unstyled">
+							<li><a href="{% url "addemployee" %}">Add Employee</a></li>
+							<li><a href="{% url "listemployee" %}">List Employee</a></li>
+						</ul>
+					</li>
+					<li>
+						<a href="javascript:;">
 							<i class="icon ion-md-cube"></i>
 							<span class="text">Material Management</span>
 							{% comment %} <i class="icon ion-md-arrow"></i> {% endcomment %}
@@ -133,6 +146,52 @@
 						<ul class="inner-drop list-unstyled">
 							{% comment %} <li><a href="{% url "addmaterial" %}">Add Material</a></li> {% endcomment %}
 							<li><a href="{% url "listinward" %}">List Inward</a></li>
+						</ul>
+					</li>
+					<li>
+						<a href="javascript:;">
+							<i class="icon ion-md-albums"></i>
+							<span class="text">Product Management</span>
+							{% comment %} <i class="icon ion-md-arrow"></i> {% endcomment %}
+						</a>
+						<ul class="inner-drop list-unstyled">
+							<li><a href="{% url "addproduct" %}">Add Product</a></li>
+							<li><a href="{% url "listproduct" %}">List Product</a></li>
+						</ul>
+					</li>
+					<li>
+						<a href="javascript:;">
+							<i class="icon ion-md-apps"></i>
+							<span class="text">Category Management</span>
+							{% comment %} <i class="icon ion-md-arrow"></i> {% endcomment %}
+						</a>
+						<ul class="inner-drop list-unstyled">
+							<li><a href="{% url "addcategories" %}">Add Category</a></li>
+							<li><a href="{% url "listcategories" %}">List Category</a></li>
+						</ul>
+					</li>
+					<li>
+						<a href="javascript:;">
+							<i class="icon ion-md-cash"></i>
+							<span class="text">Cost Management</span>
+							{% comment %} <i class="icon ion-md-arrow"></i> {% endcomment %}
+						</a>
+						<ul class="inner-drop list-unstyled">
+							<li><a href="{% url "addcost" %}">Add Cost</a></li>
+							<li><a href="{% url "listcost" %}">List Cost</a></li>
+						</ul>
+					</li>
+					<li>
+						<a href="javascript:;">
+							<i class="icon ion-md-paper"></i>
+							<span class="text">Billing Management</span>
+							{% comment %} <i class="icon ion-md-arrow"></i> {% endcomment %}
+						</a>
+						<ul class="inner-drop list-unstyled">
+							<li><a href="{% url "bill" %}">Add Bill</a></li>
+							<li><a href="{% url "listbill" %}">List Bill</a></li>
+							<li><a href="{% url "listquote" %}">List Quotation</a></li>
+							<li><a href="{% url "listestimate" %}">List Estimation</a></li>
 						</ul>
 					</li>
 

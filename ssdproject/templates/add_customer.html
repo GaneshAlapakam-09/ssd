@@ -12,6 +12,7 @@
 	<title>SSD</title>
 	
 	{% load static %}
+	<link rel="icon" type="image/x-icon" href="{% static 'images/SS_LOGO.png' %}">
 
 <!-- Font Styles -->
 <link rel="stylesheet" href="{% static 'fonts/font-awesome/css/font-awesome.min.css' %}">
@@ -92,7 +93,7 @@
 				<!-- navigation -->
 				<ul class="list-unstyled clearfix nav-list mb15">
 					<li class="active">
-						<a>
+						<a href="{% url "dashboard" %}">
 							<i class="ion ion-monitor"></i>
 							<span class="text">Dashboard</span>
 						</a>
@@ -112,6 +113,18 @@
 						<ul class="inner-drop list-unstyled">
 							<li><a href="{% url "addcustomer" %}">Add Customer</a></li>
 							<li><a href="{% url "listcustomer" %}">List Customer</a></li>
+						</ul>
+					</li>
+					{% if user.role == 'admin' %}
+					<li>
+						<a href="javascript:;">
+							<i class="icon ion-md-contact"></i>
+							<span class="text">Employee Management</span>
+							{% comment %} <i class="icon ion-md-arrow"></i> {% endcomment %}
+						</a>
+						<ul class="inner-drop list-unstyled">
+							<li><a href="{% url "addemployee" %}">Add Employee</a></li>
+							<li><a href="{% url "listemployee" %}">List Employee</a></li>
 						</ul>
 					</li>
 					<li>
@@ -134,6 +147,53 @@
 						<ul class="inner-drop list-unstyled">
 							{% comment %} <li><a href="{% url "addmaterial" %}">Add Material</a></li> {% endcomment %}
 							<li><a href="{% url "listinward" %}">List Inward</a></li>
+						</ul>
+					</li>
+					<li>
+						<a href="javascript:;">
+							<i class="icon ion-md-albums"></i>
+							<span class="text">Product Management</span>
+							{% comment %} <i class="icon ion-md-arrow"></i> {% endcomment %}
+						</a>
+						<ul class="inner-drop list-unstyled">
+							<li><a href="{% url "addproduct" %}">Add Product</a></li>
+							<li><a href="{% url "listproduct" %}">List Product</a></li>
+						</ul>
+					</li>
+					<li>
+						<a href="javascript:;">
+							<i class="icon ion-md-apps"></i>
+							<span class="text">Category Management</span>
+							{% comment %} <i class="icon ion-md-arrow"></i> {% endcomment %}
+						</a>
+						<ul class="inner-drop list-unstyled">
+							<li><a href="{% url "addcategories" %}">Add Category</a></li>
+							<li><a href="{% url "listcategories" %}">List Category</a></li>
+						</ul>
+					</li>
+					<li>
+						<a href="javascript:;">
+							<i class="icon ion-md-cash"></i>
+							<span class="text">Cost Management</span>
+							{% comment %} <i class="icon ion-md-arrow"></i> {% endcomment %}
+						</a>
+						<ul class="inner-drop list-unstyled">
+							<li><a href="{% url "addcost" %}">Add Cost</a></li>
+							<li><a href="{% url "listcost" %}">List Cost</a></li>
+						</ul>
+					</li>
+					{% endif %}
+					<li>
+						<a href="javascript:;">
+							<i class="icon ion-md-paper"></i>
+							<span class="text">Billing Management</span>
+							{% comment %} <i class="icon ion-md-arrow"></i> {% endcomment %}
+						</a>
+						<ul class="inner-drop list-unstyled">
+							<li><a href="{% url "bill" %}">Add Bill</a></li>
+							<li><a href="{% url "listbill" %}">List Bill</a></li>
+							<li><a href="{% url "listquote" %}">List Quotation</a></li>
+							<li><a href="{% url "listestimate" %}">List Estimation</a></li>
 						</ul>
 					</li>
 
@@ -161,7 +221,7 @@
         
         {% endif %}
 					<div class="panel-body">
-						<form  class="form-horizontal"  method="POST">
+						<form id='form' class="form-horizontal"  method="POST">
 							{% csrf_token %}
 							 <!-- form horizontal acts as a row -->
 							<!-- Customer Id -->
@@ -183,7 +243,8 @@
 							<div class="form-group">
 								<label class="col-md-3 control-label">Phone</label>
 								<div class="col-md-9">
-									<input type="number" class="form-control" placeholder="Phone No." name="phone" required>
+									<input type="number" class="form-control" placeholder="Phone No." id="phone" name="phone" required>
+									<span id="phoneError"></span>
 									{% comment %} <p class="text-danger text-right xsmall">Phone</p> {% endcomment %}
 								</div>
 							</div>
@@ -192,7 +253,7 @@
 							<div class="form-group">
 								<label class="col-md-3 control-label">Alt Phone</label>
 								<div class="col-md-9">
-									<input type="number" class="form-control" placeholder="Alternative Phone No." name="alt_phone" required>
+									<input type="number" class="form-control" placeholder="Alternative Phone No." name="alt_phone" required >
 								</div>
 							</div>
 							<!-- Email -->
@@ -212,11 +273,12 @@
 									<textarea rows="3" class="form-control resize-v" placeholder="Address" name="address" required></textarea>
 								</div>
 							</div>
+
 							
 							
 							
 							<div class="clearfix right">
-								<button class="btn btn-primary mr5" type="submit">Submit</button>
+								<button class="btn btn-primary mr5" type="submit" id="submitButton">Submit</button>
 							</div>
 							
 						</form>
@@ -317,5 +379,85 @@
 	<script src="{% static 'scripts/app.js' %}"></script>
 	<script src="{% static 'scripts/index.init.js' %}"></script>
 
+	{% comment %} <script>
+		// Example list of existing phone numbers (this can come from a database)
+		const existingPhoneNumbers = [
+			{% for num in phone %}
+			"{{num.Phone_No}}",
+			{% endfor %}
+		];
+		const submitButton = document.getElementById("submitButton");
+	
+		console.log(existingPhoneNumbers);
+	
+		document.getElementById("phone").addEventListener("blur", function () {
+			let enteredPhone = this.value.trim(); // Get input value and remove extra spaces
+			let errorSpan = document.getElementById("phoneError");
+	
+			if (enteredPhone.length !== 10 || isNaN(enteredPhone)) {
+				errorSpan.textContent = "Enter a valid 10-digit phone number";
+				errorSpan.style.color = "red";
+				this.style.borderColor = "red";
+				submitButton.disabled = true;
+				alert("Enter a valid 10-digit phone number")
+			} 
+			else if (existingPhoneNumbers.includes(enteredPhone)) {
+				errorSpan.textContent = "Phone number already exists!";
+				errorSpan.style.color = "red";
+				this.style.borderColor = "red";
+				submitButton.disabled = true;
+				alert("Phone number already exists!")
+			} 
+			else {
+				errorSpan.textContent = "";
+				this.style.borderColor = "green";
+				submitButton.disabled = false;
+
+			}
+		});
+	</script> {% endcomment %}
+
+
+	<script>
+		// Example list of existing phone numbers (this can come from a database)
+		const existingPhoneNumbers = [
+			{% for num in phone %}
+			"{{num.Phone_No}}--{{num.Customer_Id}}--{{num.Customer_Name}}",
+			{% endfor %}
+		];
+		const submitButton = document.getElementById("submitButton");
+	
+	
+		document.getElementById("phone").addEventListener("blur", function () {
+			let enteredPhone = this.value.trim(); // Get input value and remove extra spaces
+			let errorSpan = document.getElementById("phoneError");
+	
+			if (enteredPhone.length !== 10 || isNaN(enteredPhone)) {
+				errorSpan.textContent = "Enter a valid 10-digit phone number";
+				errorSpan.style.color = "red";
+				this.style.borderColor = "red";
+				submitButton.disabled = true;
+				{% comment %} alert("Enter a valid 10-digit phone number"); {% endcomment %}
+			} 
+			else {
+				// Check if the entered phone number exists in the array
+				let matchedPhone = existingPhoneNumbers.find(phone => phone.startsWith(enteredPhone));
+	
+				if (matchedPhone) {
+					errorSpan.textContent = `${matchedPhone} already exists!`;
+					errorSpan.style.color = "red";
+					this.style.borderColor = "red";
+					submitButton.disabled = true;
+					alert(`${matchedPhone} already exists!`);
+				} 
+				else {
+					errorSpan.textContent = "";
+					this.style.borderColor = "green";
+					submitButton.disabled = false;
+				}
+			}
+		});
+	</script>
+	
 </body>
 </html>
